@@ -229,11 +229,42 @@ int main (int argc, char **argv)
 	int prevMouseX = 0;
 	int prevMouseY = 0;
 
+    int numFrames = 0;
+	sf::Clock clock;
+
     while (window->IsOpened())
     {
 
+		//framerate
+		numFrames++;
+		if(clock.GetElapsedTime() > 1.0f)
+		{
+			std::cout << "fps: " << numFrames << std::endl;
+			numFrames = 0;
+			clock.Reset();
+		}
+
 		enterFrame();
         window->Display();
+
+		
+		if(window->GetInput().IsKeyDown(sf::Key::W))
+		{
+			camera.zoom(2);
+		}
+		else if(window->GetInput().IsKeyDown(sf::Key::S))
+		{
+			camera.zoom(-1);
+		}
+		else if(window->GetInput().IsKeyDown(sf::Key::A))
+		{
+			camera.pan(-1, 0);
+		}
+		else if(window->GetInput().IsKeyDown(sf::Key::D))
+		{
+			camera.pan(1, 0);
+		}
+
 
         sf::Event myEvent;
         while (window->GetEvent(myEvent))
@@ -283,12 +314,15 @@ int main (int argc, char **argv)
 					}
 					break;
 
+				case sf::Event::MouseWheelMoved:
+					{
+						int delta = myEvent.MouseWheel.Delta;
+						float scaleFactor = 1.0f;
+						camera.zoom(scaleFactor*delta);
+					}
+					break;
 				case sf::Event::KeyPressed:
 
-					if(myEvent.Key.Code == sf::Key::Space)
-					{
-						std::cout << "pressed spacebar" << std::endl;
-					}
 					break;
 
 				case sf::Event::Closed:

@@ -1,5 +1,5 @@
 --Name
-local name = "InstancedCulling"
+local name = "Plasticity"
 
 --Directory stuff
 local cwd = os.getcwd() .. "/"
