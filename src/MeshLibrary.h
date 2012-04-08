@@ -19,6 +19,4 @@ public:
 
 	Mesh* getMesh(int number);
 
-
-
 };
