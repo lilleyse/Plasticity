@@ -5,6 +5,8 @@
 #include "Utils.h"
 #include "Globals.h"
 #include "Cameras/Camera3rdPerson.h"
+#include "Physics/PhysicsWorld.h"
+#include "Physics/PhysicsObject.h"
 
 namespace
 {
@@ -68,14 +70,14 @@ namespace
 		GL_Light lights[MAX_NUMBER_OF_LIGHTS];
 	};
 
-
-
+	//Camera
 	Camera3rdPerson camera;
 
-
+	//Physics
+	PhysicsWorld* physicsWorld;
 }
 
-void init()
+void initGL()
 {
 	//init OpenGL
 	gl3wInit();
@@ -155,10 +157,25 @@ void init()
 	Globals::shaderState.initialize();
 	Globals::meshLibrary.initialize();
 	camera.activate();
-
-
 }
+void initPhysics()
+{
+	physicsWorld = new PhysicsWorld();
 
+	//ground plane
+	PhysicsObject* floor = new PhysicsObject();
+	floor->initializeBox(glm::vec3(10,1,10),0,0,0.5f);
+	floor->setTranslationZ(-5.0f);
+
+	//ball
+	PhysicsObject* ball = new PhysicsObject();
+	ball->initializeSphere(1.0f,1.0f,0.5f,0.5f);
+	ball->setTranslationY(2.0f);
+
+	//Add objects to physics world
+	physicsWorld->addObject(floor);
+	physicsWorld->addObject(ball);
+}
 void resize(int w, int h)
 {
 	projectionMatrix[0].x = frustumScale * (h / (float)w);
@@ -169,17 +186,12 @@ void resize(int w, int h)
 
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 
-
 	//set projection matrix through orphaning
 	glBindBuffer(GL_UNIFORM_BUFFER, projectionUBO);
 	glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), 
 			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-
-		*Pointer = projectionMatrix;
-
+	*Pointer = projectionMatrix;
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
-
-
 }
 
 void enterFrame()
@@ -192,18 +204,20 @@ void enterFrame()
 	glBindBuffer(GL_UNIFORM_BUFFER, modelViewUBO);
 	glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), 
 			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-
-		glm::mat4 model = glm::mat4(1.0f);
-		glm::mat4 view = Globals::viewMatrix;
-		glm::mat4 modelView = view * model;
-
-		*Pointer = modelView;
-
-	glUnmapBuffer(GL_UNIFORM_BUFFER);
-
 	Globals::shaderState.prepareForRender();
-	Globals::meshLibrary.render();
+	glm::mat4 view = Globals::viewMatrix;
 
+	//Render all of the physics world objects
+	std::vector<PhysicsObject*>& objects = physicsWorld->getObjects();
+	for(int i = 0; i < objects.size(); i++)
+	{
+		PhysicsObject* object = objects.at(i);
+		glm::mat4 model = object->getTransformationMatrix();
+		glm::mat4 modelView = view * model;
+		*Pointer = modelView;
+		object->getAttachedMesh()->render();
+	}
+	glUnmapBuffer(GL_UNIFORM_BUFFER);
 }
 
 
@@ -222,7 +236,9 @@ int main (int argc, char **argv)
     //window->UseVerticalSync(true);
     //window->SetFramerateLimit(100);
 
-	init();
+	initGL();
+	initPhysics();
+
 	resize(width, height);
 
 	bool mouseDown = false;

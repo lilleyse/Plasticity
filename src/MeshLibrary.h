@@ -13,12 +13,8 @@ public:
 	~MeshLibrary();
 
 	void initialize();
-	void render();
 
 	std::vector<Mesh*> meshes;
 
 	Mesh* getMesh(int number);
-
-
-
 };
