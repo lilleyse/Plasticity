@@ -163,20 +163,31 @@ void initPhysics()
 	physicsWorld = new PhysicsWorld();
 
 	//ground plane
-	PhysicsObject* floor = new PhysicsObject();
-	floor->initializeBox(glm::vec3(10,1,10),0,0,0.5f);
-	floor->setTranslationZ(0.0f);
+	PhysicsObject* floor = new PhysicsObject(PRIMITIVE_BOX,0.0f,0.1f,0.8f);
+	floor->setScale(glm::vec3(10.0f,1.0f,10.0f));
 	floor->attachMesh(Globals::meshLibrary.getMesh(1));
-
-	//ball
-	PhysicsObject* ball = new PhysicsObject();
-	ball->initializeSphere(0.5f,1.0f,1.0f,0.1f);
-	ball->setTranslationY(3.0f);
-	ball->attachMesh(Globals::meshLibrary.getMesh(3));
-
-	//Add objects to physics world
 	physicsWorld->addObject(floor);
-	physicsWorld->addObject(ball);
+
+	//balls
+	for(int i = 0; i < 50; i++)
+	{
+		PhysicsObject* object;
+
+		int objectType = i % 2;
+		if(objectType == 0) //sphere
+		{
+			object = new PhysicsObject(PRIMITIVE_SPHERE, 1.0f,0.1f,0.8f);
+			object->attachMesh(Globals::meshLibrary.getMesh(3));
+		}
+		else if(objectType == 1) //cube
+		{
+			object = new PhysicsObject(PRIMITIVE_BOX, 1.0f,0.1f,0.8f);
+			object->attachMesh(Globals::meshLibrary.getMesh(1));
+		}
+		 
+		object->setTranslationY((float)(i*2) + 3.0f);
+		physicsWorld->addObject(object);
+	}
 }
 void resize(int w, int h)
 {

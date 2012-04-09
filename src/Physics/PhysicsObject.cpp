@@ -1,22 +1,14 @@
 #include "PhysicsObject.h"
 
-PhysicsObject::PhysicsObject(){}
+PhysicsObject::PhysicsObject(PRIMITIVE_TYPE type, float mass, float restitution, float friction)
+{
+	if(type == PRIMITIVE_BOX)
+		this->primitiveData = new PrimitiveDataBox(glm::vec3(1,1,1));
+	else if(type == PRIMITIVE_SPHERE)
+		this->primitiveData = new PrimitiveDataSphere(1.0f);
+	this->createRigidBody(mass,friction,restitution);
+}
 PhysicsObject::~PhysicsObject(){}
-
-void PhysicsObject::initializeSphere(float radius, float mass, float restitution, float friction)
-{
-	this->primitiveData = new PrimitiveDataSphere(radius);
-	this->createRigidBody(mass,friction,restitution);
-}
-void PhysicsObject::initializeBox(glm::vec3 dimensions, float mass, float restitution, float friction)
-{
-	this->primitiveData = new PrimitiveDataBox(dimensions);
-	this->createRigidBody(mass,friction,restitution);
-}
-void PhysicsObject::initializeMesh(float mass, float restitution, float friction)
-{
-	//Do nothing yet...
-}
 
 //RigidBody
 void PhysicsObject::createRigidBody(float mass, float friction, float restitution)
@@ -92,6 +84,7 @@ glm::mat4 PhysicsObject::getTransformationMatrix()
 }
 void PhysicsObject::updateTransformationMatrix()
 {
+	//Scaling is not part of the world transform, so we need to add it manually
 	btVector3 btScaleAmount = this->rigidBody->getCollisionShape()->getLocalScaling();
 	glm::mat4 scaleMat = glm::mat4();
 	scaleMat[0][0] = btScaleAmount.getX();
@@ -177,6 +170,55 @@ void PhysicsObject::setTranslation(glm::vec3 vector)
 glm::vec3 PhysicsObject::getTranslation()
 {
     return glm::vec3(this->transformationMatrix[3]);
+}
+
+//Scale
+void PhysicsObject::scaleX(float amount)
+{
+    btVector3 scaleAmount = this->rigidBody->getCollisionShape()->getLocalScaling();
+	scaleAmount += btVector3(amount,0,0);
+	this->rigidBody->getCollisionShape()->setLocalScaling(scaleAmount);
+	this->updateTransformationMatrix();
+}
+void PhysicsObject::scaleY(float amount)
+{
+    btVector3 scaleAmount = this->rigidBody->getCollisionShape()->getLocalScaling();
+	scaleAmount += btVector3(0,amount,0);
+	this->rigidBody->getCollisionShape()->setLocalScaling(scaleAmount);
+	this->updateTransformationMatrix();
+}
+void PhysicsObject::scaleZ(float amount)
+{
+    btVector3 scaleAmount = this->rigidBody->getCollisionShape()->getLocalScaling();
+	scaleAmount += btVector3(0,0,amount);
+	this->rigidBody->getCollisionShape()->setLocalScaling(scaleAmount);
+	this->updateTransformationMatrix();
+}
+void PhysicsObject::scale(float amount)
+{
+    btVector3 scaleAmount = this->rigidBody->getCollisionShape()->getLocalScaling();
+	scaleAmount += btVector3(amount,amount,amount);
+	this->rigidBody->getCollisionShape()->setLocalScaling(scaleAmount);
+	this->updateTransformationMatrix();
+}
+void PhysicsObject::scale(glm::vec3 vector)
+{
+	btVector3 scaleAmount = this->rigidBody->getCollisionShape()->getLocalScaling();
+	scaleAmount += btVector3(vector.x,vector.y,vector.z);
+	this->rigidBody->getCollisionShape()->setLocalScaling(scaleAmount);
+	this->updateTransformationMatrix();
+}
+void PhysicsObject::setScale(float amount)
+{
+	btVector3 scaleAmount = btVector3(amount,amount,amount);
+    this->rigidBody->getCollisionShape()->setLocalScaling(scaleAmount);
+	this->updateTransformationMatrix();
+}
+void PhysicsObject::setScale(glm::vec3 vector)
+{
+	btVector3 scaleAmount = btVector3(vector.x,vector.y,vector.z);
+    this->rigidBody->getCollisionShape()->setLocalScaling(scaleAmount);
+	this->updateTransformationMatrix();
 }
 
 //Rotation

@@ -13,6 +13,15 @@ different types of physics primitives,
 including Spheres, Cubes, Meshes, and more
 ------------------------------------------*/
 
+enum PRIMITIVE_TYPE {
+	PRIMITIVE_BOX,       //box
+	PRIMITIVE_SPHERE,    //sphere
+	PRIMITIVE_CYLINDER,  //cylinder
+	PRIMITIVE_CONE,      //cone
+	PRIMITIVE_CAPSULE,   //capsule
+	PRIMITIVE_MESH,      //mesh
+};
+
 struct PrimitiveData
 {
 	PrimitiveData(){}

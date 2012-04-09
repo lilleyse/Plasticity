@@ -17,14 +17,8 @@ class PhysicsObject
 public:
 
 	//Constructors
-	PhysicsObject();
+	PhysicsObject(PRIMITIVE_TYPE type, float mass, float restitution, float friction);
 	~PhysicsObject();
-
-	//Create new PrimitiveData
-	//Each calls createRigidBody
-	void initializeSphere(float radius, float mass, float restitution, float friction);
-	void initializeBox(glm::vec3 dimensions, float mass, float restitution, float friction);
-	void initializeMesh(float mass, float restitution, float friction); //undefined
 
 	//Rigidbody
 	btRigidBody* getRigidBody();
@@ -59,6 +53,15 @@ public:
     void setTranslationY(float amount);
     void setTranslationZ(float amount);
     void setTranslation(glm::vec3 vector);
+
+	//Scale
+	void scaleX(float amount);
+    void scaleY(float amount);
+    void scaleZ(float amount);
+    void scale(float amount);
+    void scale(glm::vec3 vector);
+    void setScale(float amount);
+    void setScale(glm::vec3 vector);
 
 	//Rotation
     void yaw(float angle);
