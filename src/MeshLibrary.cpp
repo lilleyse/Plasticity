@@ -1,21 +1,28 @@
 #include "MeshLibrary.h"
 
-MeshLibrary::MeshLibrary()
-{
-
-}
-
-MeshLibrary::~MeshLibrary()
-{
-
-}
+MeshLibrary::MeshLibrary(){}
+MeshLibrary::~MeshLibrary(){}
 
 void MeshLibrary::initialize()
 {
-	std::string filename = "data/meshes/pumpkin.dae";
-	ColladaData* data = Loader::readColladaAsset(Utils::getFilePath(filename));
-	Mesh* mesh = new Mesh(data->positionData, data->normalsData, data->elementArray);
-	meshes.push_back(mesh);
+	ColladaData* data;
+	std::string filename;
+
+	filename = "data/meshes/pumpkin.dae";
+	data = Loader::readColladaAsset(Utils::getFilePath(filename));
+	meshes.push_back(new Mesh(data->positionData, data->normalsData, data->elementArray));
+
+	filename = "data/meshes/cube.dae";
+	data = Loader::readColladaAsset(Utils::getFilePath(filename));
+	meshes.push_back(new Mesh(data->positionData, data->normalsData, data->elementArray));
+
+	filename = "data/meshes/cylinder.dae";
+	data = Loader::readColladaAsset(Utils::getFilePath(filename));
+	meshes.push_back(new Mesh(data->positionData, data->normalsData, data->elementArray));
+
+	filename = "data/meshes/sphere.dae";
+	data = Loader::readColladaAsset(Utils::getFilePath(filename));
+	meshes.push_back(new Mesh(data->positionData, data->normalsData, data->elementArray));
 }
 
 Mesh* MeshLibrary::getMesh(int number)
