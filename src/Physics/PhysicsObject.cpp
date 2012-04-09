@@ -44,13 +44,13 @@ btRigidBody* PhysicsObject::getRigidBody()
 }
 
 //Mesh
-void PhysicsObject::attachMesh(Mesh* mesh)
+void PhysicsObject::attachMesh(Mesh* attachedMesh)
 {
-	this->mesh = mesh;
+	this->attachedMesh = attachedMesh;
 }
 Mesh* PhysicsObject::getAttachedMesh()
 {
-	return this->mesh;
+	return this->attachedMesh;
 }
 
 //Mass
@@ -90,6 +90,17 @@ glm::mat4 PhysicsObject::getTransformationMatrix()
 {
 	return this->transformationMatrix;
 }
+void PhysicsObject::updateTransformationMatrix()
+{
+	btVector3 btScaleAmount = this->rigidBody->getCollisionShape()->getLocalScaling();
+	glm::mat4 scaleMat = glm::mat4();
+	scaleMat[0][0] = btScaleAmount.getX();
+	scaleMat[1][1] = btScaleAmount.getY();
+	scaleMat[2][2] = btScaleAmount.getZ();
+
+	btTransform bulletTransform = this->rigidBody->getWorldTransform();
+	this->transformationMatrix = Utils::convertBulletTransformToGLM(bulletTransform) * scaleMat;
+}
 
 //Translation
 void PhysicsObject::translateX(float amount)
@@ -99,7 +110,7 @@ void PhysicsObject::translateX(float amount)
 	position += btVector3(amount,0,0);
 	bulletTransform.setOrigin(position);
 	this->rigidBody->setWorldTransform(bulletTransform);
-	this->transformationMatrix = Utils::convertBulletTransformToGLM(bulletTransform);
+	this->updateTransformationMatrix();
 }
 void PhysicsObject::translateY(float amount)
 {
@@ -108,7 +119,7 @@ void PhysicsObject::translateY(float amount)
 	position += btVector3(0,amount,0);
 	bulletTransform.setOrigin(position);
 	this->rigidBody->setWorldTransform(bulletTransform);
-	this->transformationMatrix = Utils::convertBulletTransformToGLM(bulletTransform);
+	this->updateTransformationMatrix();
 }
 void PhysicsObject::translateZ(float amount)
 {
@@ -117,7 +128,7 @@ void PhysicsObject::translateZ(float amount)
 	position += btVector3(0,0,amount);
 	bulletTransform.setOrigin(position);
 	this->rigidBody->setWorldTransform(bulletTransform);
-	this->transformationMatrix = Utils::convertBulletTransformToGLM(bulletTransform);
+	this->updateTransformationMatrix();
 }
 void PhysicsObject::translate(glm::vec3 vector)
 {
@@ -126,7 +137,7 @@ void PhysicsObject::translate(glm::vec3 vector)
 	position += btVector3(vector.x,vector.y,vector.z);
 	bulletTransform.setOrigin(position);
 	this->rigidBody->setWorldTransform(bulletTransform);
-	this->transformationMatrix = Utils::convertBulletTransformToGLM(bulletTransform);
+	this->updateTransformationMatrix();
 }
 void PhysicsObject::setTranslationX(float amount)
 {
@@ -135,7 +146,7 @@ void PhysicsObject::setTranslationX(float amount)
 	position += btVector3(amount,0,0);
 	bulletTransform.setOrigin(position);
 	this->rigidBody->setWorldTransform(bulletTransform);
-	this->transformationMatrix = Utils::convertBulletTransformToGLM(bulletTransform);
+	this->updateTransformationMatrix();
 }
 void PhysicsObject::setTranslationY(float amount)
 {
@@ -144,7 +155,7 @@ void PhysicsObject::setTranslationY(float amount)
 	position += btVector3(0,amount,0);
 	bulletTransform.setOrigin(position);
 	this->rigidBody->setWorldTransform(bulletTransform);
-	this->transformationMatrix = Utils::convertBulletTransformToGLM(bulletTransform);
+	this->updateTransformationMatrix();
 }
 void PhysicsObject::setTranslationZ(float amount)
 {
@@ -153,7 +164,7 @@ void PhysicsObject::setTranslationZ(float amount)
 	position += btVector3(0,0,amount);
 	bulletTransform.setOrigin(position);
 	this->rigidBody->setWorldTransform(bulletTransform);
-	this->transformationMatrix = Utils::convertBulletTransformToGLM(bulletTransform);
+	this->updateTransformationMatrix();
 }
 void PhysicsObject::setTranslation(glm::vec3 vector)
 {
@@ -161,7 +172,7 @@ void PhysicsObject::setTranslation(glm::vec3 vector)
 	btVector3 position = btVector3(vector.x,vector.y,vector.z);
 	bulletTransform.setOrigin(position);
 	this->rigidBody->setWorldTransform(bulletTransform);
-	this->transformationMatrix = Utils::convertBulletTransformToGLM(bulletTransform);
+	this->updateTransformationMatrix();
 }
 glm::vec3 PhysicsObject::getTranslation()
 {

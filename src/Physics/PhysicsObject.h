@@ -30,7 +30,7 @@ public:
 	btRigidBody* getRigidBody();
 
 	//Mesh
-	void attachMesh(Mesh* mesh);
+	void attachMesh(Mesh* attachedMesh);
 	Mesh* getAttachedMesh();
 
 	//Mass
@@ -69,8 +69,9 @@ public:
 private:
 
 	void createRigidBody(float mass, float friction, float restitution);
-	
-	Mesh* mesh;
+	void updateTransformationMatrix();
+
+	Mesh* attachedMesh;
 	btRigidBody* rigidBody;
 	PrimitiveData* primitiveData;
 	glm::mat4 transformationMatrix;

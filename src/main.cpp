@@ -164,13 +164,15 @@ void initPhysics()
 
 	//ground plane
 	PhysicsObject* floor = new PhysicsObject();
-	floor->initializeBox(glm::vec3(10,1,10),0,0,0.5f);
-	floor->setTranslationZ(-5.0f);
+	floor->initializeBox(glm::vec3(10,1,10),1,1,0.5f);
+	floor->setTranslationZ(0.0f);
+	floor->attachMesh(Globals::meshLibrary.getMesh(1));
 
 	//ball
 	PhysicsObject* ball = new PhysicsObject();
-	ball->initializeSphere(1.0f,1.0f,0.5f,0.5f);
-	ball->setTranslationY(2.0f);
+	ball->initializeSphere(0.1f,1.0f,0.5f,0.5f);
+	ball->setTranslationY(3.0f);
+	ball->attachMesh(Globals::meshLibrary.getMesh(3));
 
 	//Add objects to physics world
 	physicsWorld->addObject(floor);
@@ -200,24 +202,25 @@ void enterFrame()
     glClearDepth(1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//update the model-view matrix through orphaning
-	glBindBuffer(GL_UNIFORM_BUFFER, modelViewUBO);
-	glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), 
-			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 	Globals::shaderState.prepareForRender();
-	glm::mat4 view = Globals::viewMatrix;
-
-	//Render all of the physics world objects
+	glBindBuffer(GL_UNIFORM_BUFFER, modelViewUBO);
+	
+	physicsWorld->update();
 	std::vector<PhysicsObject*>& objects = physicsWorld->getObjects();
-	for(int i = 0; i < objects.size(); i++)
+	for(unsigned int i = 0; i < objects.size(); i++)
 	{
+		glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), 
+				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+
 		PhysicsObject* object = objects.at(i);
 		glm::mat4 model = object->getTransformationMatrix();
+		glm::mat4 view = Globals::viewMatrix;
 		glm::mat4 modelView = view * model;
 		*Pointer = modelView;
+
+		glUnmapBuffer(GL_UNIFORM_BUFFER);
 		object->getAttachedMesh()->render();
 	}
-	glUnmapBuffer(GL_UNIFORM_BUFFER);
 }
 
 
@@ -230,11 +233,11 @@ int main (int argc, char **argv)
     // Create the main rendering window
 	int width = 800;
 	int height = 800;
-	sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode(width, height, 32), "Instanced Culling", 6UL, sf::WindowSettings(24U, 8U, 4U));
+	sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode(width, height, 32), "Plasticity", 6UL, sf::WindowSettings(24U, 8U, 4U));
 	
     window->SetActive();
-    //window->UseVerticalSync(true);
-    //window->SetFramerateLimit(100);
+    window->UseVerticalSync(true);
+    window->SetFramerateLimit(60);
 
 	initGL();
 	initPhysics();

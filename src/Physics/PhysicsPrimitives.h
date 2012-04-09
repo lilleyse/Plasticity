@@ -5,7 +5,7 @@
 #include <bullet/BulletCollision/CollisionShapes/btConeShape.h>
 #include <bullet/BulletCollision/CollisionShapes/btCapsuleShape.h>
 
-#include <vector>
+#include "PhysicsUtils.h"
 
 /*------------------------------------------
 This class contains information about
@@ -23,11 +23,9 @@ struct PrimitiveData
 //Box
 struct PrimitiveDataBox : public PrimitiveData
 {
-	glm::vec3 dimensions;
 	PrimitiveDataBox(glm::vec3 dimensions) : PrimitiveData() 
 	{
-		this->dimensions = dimensions;
-		btVector3 dimensionsBullet = btVector3(dimensions.x,dimensions.y,dimensions.z);
+		btVector3 dimensionsBullet = Utils::convertGLMVectorToBullet(dimensions);
 		this->collisionShape = new btBoxShape(dimensionsBullet);
 	}
 };
@@ -35,10 +33,8 @@ struct PrimitiveDataBox : public PrimitiveData
 //Sphere
 struct PrimitiveDataSphere : public PrimitiveData
 {
-	float radius;
 	PrimitiveDataSphere(float radius) : PrimitiveData() 
 	{
-		this->radius = radius;
 		this->collisionShape = new btSphereShape(radius);
 	}
 };
