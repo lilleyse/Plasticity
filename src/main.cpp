@@ -164,13 +164,13 @@ void initPhysics()
 
 	//ground plane
 	PhysicsObject* floor = new PhysicsObject();
-	floor->initializeBox(glm::vec3(10,1,10),1,1,0.5f);
+	floor->initializeBox(glm::vec3(10,1,10),0,0,0.5f);
 	floor->setTranslationZ(0.0f);
 	floor->attachMesh(Globals::meshLibrary.getMesh(1));
 
 	//ball
 	PhysicsObject* ball = new PhysicsObject();
-	ball->initializeSphere(0.1f,1.0f,0.5f,0.5f);
+	ball->initializeSphere(0.5f,1.0f,1.0f,0.1f);
 	ball->setTranslationY(3.0f);
 	ball->attachMesh(Globals::meshLibrary.getMesh(3));
 
@@ -213,6 +213,7 @@ void enterFrame()
 				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 
 		PhysicsObject* object = objects.at(i);
+		object->updateTransformationMatrix();
 		glm::mat4 model = object->getTransformationMatrix();
 		glm::mat4 view = Globals::viewMatrix;
 		glm::mat4 modelView = view * model;

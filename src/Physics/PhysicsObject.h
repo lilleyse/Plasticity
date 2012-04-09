@@ -47,6 +47,7 @@ public:
 
 	//Transformation methods
 	glm::mat4 getTransformationMatrix();
+	void updateTransformationMatrix();
 
 	//Translation
 	glm::vec3 getTranslation();
@@ -69,7 +70,6 @@ public:
 private:
 
 	void createRigidBody(float mass, float friction, float restitution);
-	void updateTransformationMatrix();
 
 	Mesh* attachedMesh;
 	btRigidBody* rigidBody;
