@@ -1,8 +1,11 @@
 #include "PhysicsObject.h"
 
 
-PhysicsObject::PhysicsObject(PRIMITIVE_TYPE type, float mass, float restitution, float friction)
+PhysicsObject::PhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh,
+	float mass, float restitution, float friction)
 {
+	this->attachedMesh = new Mesh(*baseMesh);
+
 	if(type == PRIMITIVE_BOX)
 	{
 		this->collisionShape = new btBoxShape(btVector3(1.0f,1.0f,1.0f));
@@ -10,6 +13,35 @@ PhysicsObject::PhysicsObject(PRIMITIVE_TYPE type, float mass, float restitution,
 	else if(type == PRIMITIVE_SPHERE)
 	{
 		this->collisionShape = new btSphereShape(1.0f);
+	}
+	else if(type == PRIMITIVE_MESH)
+	{
+		int numTriangles = baseMesh->elementArray.size()/3;
+		int vertexStride = 3*sizeof(float);
+		int indexStride = 3*sizeof(int);
+		int numVertices = baseMesh->vertices.size();
+
+		btTriangleIndexVertexArray* indexVertexArrays = new btTriangleIndexVertexArray(
+			numTriangles,
+			&baseMesh->elementArrayForBullet[0],
+			indexStride,
+			numVertices,
+			&baseMesh->positions[0],
+			vertexStride);
+
+		if(mass == 0)
+		{
+			float dim = 100;
+			btVector3 aabbMin(-dim,-dim,-dim);
+			btVector3 aabbMax(dim,dim,dim);
+			this->collisionShape = new btBvhTriangleMeshShape(indexVertexArrays,true,aabbMin,aabbMax);
+		}
+		else
+		{
+			btGImpactMeshShape * trimesh = new btGImpactMeshShape(indexVertexArrays);
+			trimesh->updateBound();
+			this->collisionShape = trimesh;
+		}
 	}
 	this->createRigidBody(mass,friction,restitution);
 }
@@ -39,11 +71,6 @@ btRigidBody* PhysicsObject::getRigidBody()
 }
 
 //Mesh
-void PhysicsObject::attachMesh(BaseMesh* baseMesh)
-{
-	Mesh* mesh = new Mesh(*baseMesh);
-	this->attachedMesh = mesh;
-}
 Mesh* PhysicsObject::getAttachedMesh()
 {
 	return this->attachedMesh;

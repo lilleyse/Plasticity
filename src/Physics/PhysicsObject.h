@@ -1,6 +1,8 @@
 #pragma once
 
 #include <bullet/btBulletDynamicsCommon.h>
+#include <bullet/BulletCollision/Gimpact/btGImpactShape.h>
+#include <bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 #include <glm/glm.hpp>
 
 #include "../Mesh.h"
@@ -25,14 +27,13 @@ class PhysicsObject
 public:
 
 	//Constructors
-	PhysicsObject(PRIMITIVE_TYPE type, float mass, float restitution, float friction);
+	PhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh, float mass, float restitution, float friction);
 	~PhysicsObject();
 
 	//Rigidbody
 	btRigidBody* getRigidBody();
 
 	//Mesh
-	void attachMesh(BaseMesh* baseMesh);
 	Mesh* getAttachedMesh();
 
 	//Mass
