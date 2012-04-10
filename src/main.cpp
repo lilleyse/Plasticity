@@ -186,7 +186,7 @@ void initPhysics()
 
 	//Bullet
 	PhysicsObject* bullet = new PhysicsObject(
-		PRIMITIVE_SPHERE,
+		PRIMITIVE_MESH,
 		Globals::meshLibrary.getMesh(3),
 		1.0f,0.1f,0.7f);
 	bullet->setTranslationY(10);
@@ -280,7 +280,7 @@ int main (int argc, char **argv)
 		numFrames++;
 		if(clock.GetElapsedTime() > 1.0f)
 		{
-			std::cout << "fps: " << numFrames << std::endl;
+			//std::cout << "fps: " << numFrames << std::endl;
 			numFrames = 0;
 			clock.Reset();
 		}

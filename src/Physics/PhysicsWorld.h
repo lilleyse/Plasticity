@@ -6,6 +6,7 @@
 #include <bullet/btBulletDynamicsCommon.h>
 
 #include "PhysicsObject.h"
+#include "../Utils.h"
 
 class PhysicsWorld
 {
