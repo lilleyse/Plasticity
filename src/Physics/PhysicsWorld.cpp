@@ -20,6 +20,47 @@ PhysicsWorld::~PhysicsWorld(){}
 void PhysicsWorld::update()
 {
 	this->dynamicsWorld->stepSimulation(1.0f/60.0f);
+
+	int numManifolds = this->dynamicsWorld->getDispatcher()->getNumManifolds();
+	for (int i=0;i<numManifolds;i++)
+	{
+		btPersistentManifold* contactManifold =  this->dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+		btCollisionObject* obA = static_cast<btCollisionObject*>(contactManifold->getBody0());
+		btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
+	
+		int numContacts = contactManifold->getNumContacts();
+		for (int j=0;j<numContacts;j++)
+		{
+			btManifoldPoint& pt = contactManifold->getContactPoint(j);
+			float impulse = pt.getAppliedImpulse();
+			if (pt.getDistance() < 0.f && impulse > 3.0f)
+			{
+				const btVector3& ptA = pt.getPositionWorldOnA();
+				const btVector3& ptB = pt.getPositionWorldOnB();
+
+				std::cout << "Impulse: " << impulse << std::endl;
+				if(obA->getCollisionShape()->isConcave())
+				{
+					int indexA = pt.m_index0;
+					btVector3 normalOnA = -pt.m_normalWorldOnB;
+					std::cout << "A: ";
+					std::cout << "normal: ";
+					Utils::printVec3(Utils::convertBulletVectorToGLM(normalOnA));
+					std::cout << "index: " << indexA << std::endl;
+				}
+				if(obB->getCollisionShape()->isConcave())
+				{
+					int indexB = pt.m_index1;
+					btVector3 normalOnB = pt.m_normalWorldOnB;
+					std::cout << "B: ";
+					std::cout << "normal: ";
+					Utils::printVec3(Utils::convertBulletVectorToGLM(normalOnB));
+					std::cout << "index: " << indexB << std::endl;
+				}
+			}
+		}
+	}
+
 }
 void PhysicsWorld::addObject(PhysicsObject* object)
 {

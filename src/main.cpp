@@ -163,7 +163,11 @@ void initGL()
 	//init other things
 	Globals::shaderState.initialize();
 	Globals::meshLibrary.initialize();
+
+	//Camera
 	camera.activate();
+	camera.zoom(-15);
+	camera.rotate(0,-.5);
 }
 void initPhysics()
 {
@@ -174,37 +178,19 @@ void initPhysics()
 
 	//ground plane
 	PhysicsObject* floor = new PhysicsObject(
-		PRIMITIVE_BOX,
-		Globals::meshLibrary.getMesh(1),
+		PRIMITIVE_MESH,
+		Globals::meshLibrary.getMesh(5),
 		0.0f,0.1f,0.8f);
-	floor->setScale(glm::vec3(10.0f,1.0f,10.0f));
+	floor->setScale(glm::vec3(1.0f,1.0f,1.0f));
 	physicsWorld->addObject(floor);
 
-	//balls
-	for(int i = 0; i < 10; i++)
-	{
-		PhysicsObject* object;
-
-		int objectType = i > 2;
-		if(objectType == 0) //concave
-		{
-			object = new PhysicsObject(
-				PRIMITIVE_MESH,
-				Globals::meshLibrary.getMesh(4),
-				1.0f,0.1f,0.8f);
-		}
-		else if(objectType == 1) //cube
-		{
-			object = new PhysicsObject(
-				PRIMITIVE_BOX,
-				Globals::meshLibrary.getMesh(1),
-				1.0f,0.1f,0.8f);
-		}
-		 
-		object->setTranslationY((float)(i*2) + 3.0f);
-		object->setTranslationX((float)(i));
-		physicsWorld->addObject(object);
-	}
+	//Bullet
+	PhysicsObject* bullet = new PhysicsObject(
+		PRIMITIVE_MESH,
+		Globals::meshLibrary.getMesh(3),
+		1.0f,0.1f,0.7f);
+	bullet->setTranslationY(10);
+	physicsWorld->addObject(bullet);
 }
 void resize(int w, int h)
 {
@@ -278,6 +264,8 @@ int main (int argc, char **argv)
 
 	resize(width, height);
 
+	bool paused = false;
+
 	bool mouseDown = false;
 	int prevMouseX = 0;
 	int prevMouseY = 0;
@@ -292,12 +280,14 @@ int main (int argc, char **argv)
 		numFrames++;
 		if(clock.GetElapsedTime() > 1.0f)
 		{
-			std::cout << "fps: " << numFrames << std::endl;
+			//std::cout << "fps: " << numFrames << std::endl;
 			numFrames = 0;
 			clock.Reset();
 		}
 
-		enterFrame();
+		if(!paused)
+			enterFrame();
+
         window->Display();
 
 		
@@ -375,7 +365,10 @@ int main (int argc, char **argv)
 					}
 					break;
 				case sf::Event::KeyPressed:
-
+					if(myEvent.Key.Code == sf::Key::Space)
+					{
+						paused = !paused;
+					}
 					break;
 
 				case sf::Event::Closed:
