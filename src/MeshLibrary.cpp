@@ -23,6 +23,10 @@ void MeshLibrary::initialize()
 	filename = "data/meshes/sphere.dae";
 	data = Loader::readColladaAsset(Utils::getFilePath(filename));
 	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray));
+
+	filename = "data/meshes/weirdConcave.dae";
+	data = Loader::readColladaAsset(Utils::getFilePath(filename));
+	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray));
 }
 
 BaseMesh* MeshLibrary::getMesh(int number)
