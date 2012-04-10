@@ -10,22 +10,22 @@ void MeshLibrary::initialize()
 
 	filename = "data/meshes/pumpkin.dae";
 	data = Loader::readColladaAsset(Utils::getFilePath(filename));
-	meshes.push_back(new Mesh(data->positionData, data->normalsData, data->elementArray));
+	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray));
 
 	filename = "data/meshes/cube.dae";
 	data = Loader::readColladaAsset(Utils::getFilePath(filename));
-	meshes.push_back(new Mesh(data->positionData, data->normalsData, data->elementArray));
+	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray));
 
 	filename = "data/meshes/cylinder.dae";
 	data = Loader::readColladaAsset(Utils::getFilePath(filename));
-	meshes.push_back(new Mesh(data->positionData, data->normalsData, data->elementArray));
+	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray));
 
 	filename = "data/meshes/sphere.dae";
 	data = Loader::readColladaAsset(Utils::getFilePath(filename));
-	meshes.push_back(new Mesh(data->positionData, data->normalsData, data->elementArray));
+	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray));
 }
 
-Mesh* MeshLibrary::getMesh(int number)
+BaseMesh* MeshLibrary::getMesh(int number)
 {
 	return meshes[number];
 }

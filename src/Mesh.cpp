@@ -1,36 +1,23 @@
 #include "Mesh.h"
 
-Mesh::Mesh(std::vector<float>& positionData, std::vector<float>& normalsData, std::vector<unsigned short>& elementArray)
+Mesh::Mesh(BaseMesh& baseMesh)
 {
 	
 	//create opengl mesh based on the positions
 	
-	int numVertices = positionData.size()/3;
-	numElements = elementArray.size();
-
-	Vertex* vertices = new Vertex[numVertices];
-
-	for(int i = 0; i < numVertices; i++)
-	{
-		vertices[i].x = positionData[i*3 + 0];
-		vertices[i].y = positionData[i*3 + 1];
-		vertices[i].z = positionData[i*3 + 2];
-
-		vertices[i].nx = normalsData[i*3 + 0];
-		vertices[i].ny = normalsData[i*3 + 1];
-		vertices[i].nz = normalsData[i*3 + 2];
-	}
+	int numVertices = baseMesh.vertices.size();
+	numElements = baseMesh.elementArray.size();
 
 	//create and bind array buffer, set data
     glGenBuffers(1, &arrayBufferObject);
     glBindBuffer(GL_ARRAY_BUFFER, arrayBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*numVertices, vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*numVertices, &baseMesh.vertices[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     //create and bind element array buffer, set data to the stored element array, then close buffer
     glGenBuffers(1, &elementBufferObject);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort)*numElements, &elementArray[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort)*numElements, &baseMesh.elementArray[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	//create and bind vao
@@ -58,7 +45,6 @@ Mesh::Mesh(std::vector<float>& positionData, std::vector<float>& normalsData, st
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	delete[] vertices;
 
 }
 

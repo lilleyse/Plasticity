@@ -1,13 +1,7 @@
 #pragma once
 #include <gl3w/gl3w.h>
 #include <vector>
-
-struct Vertex
-{
-	float x, y, z;
-	float nx, ny, nz;
-	float s, t;
-};
+#include "BaseMesh.h"
 
 enum Attributes
 {
@@ -19,7 +13,7 @@ enum Attributes
 class Mesh
 {
 public:
-	Mesh(std::vector<float>& positionData, std::vector<float>& normalsData, std::vector<unsigned short>& elementArray);
+	Mesh(BaseMesh& baseMesh);
 	~Mesh();
 
 	void render();
