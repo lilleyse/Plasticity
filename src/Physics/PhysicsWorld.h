@@ -16,12 +16,12 @@ public:
 	void update();
 	std::vector<PhysicsObject*>& getObjects();
 
-private:
 	btDefaultCollisionConfiguration* collisionConfiguration;
 	btDynamicsWorld* dynamicsWorld;
 	btBroadphaseInterface*	broadphase;
 	btCollisionDispatcher*	dispatcher;
 	btConstraintSolver*	solver;
 
+private:
 	std::vector<PhysicsObject*> objects;
 };

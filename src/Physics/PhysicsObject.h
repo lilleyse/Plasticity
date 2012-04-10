@@ -1,6 +1,8 @@
 #pragma once
 
 #include <bullet/btBulletDynamicsCommon.h>
+#include <bullet/BulletCollision/Gimpact/btGImpactShape.h>
+#include <bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 #include <glm/glm.hpp>
 
 #include "../Mesh.h"

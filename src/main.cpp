@@ -1,7 +1,11 @@
-#include <gl3w/gl3w.h>
-#include <SFML/Graphics.hpp>
 #include <iostream>
+
+#include <gl3w/gl3w.h>
 #include <glm/glm.hpp>
+#include <SFML/Graphics.hpp>
+#include <bullet/BulletCollision/Gimpact/btGImpactShape.h>
+#include <bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
+
 #include "Utils.h"
 #include "Globals.h"
 #include "Cameras/Camera3rdPerson.h"
@@ -162,25 +166,28 @@ void initPhysics()
 {
 	physicsWorld = new PhysicsWorld();
 
+	btCollisionDispatcher * dispatcher = static_cast<btCollisionDispatcher *>(physicsWorld->dynamicsWorld->getDispatcher());
+	btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
+
 	//ground plane
 	PhysicsObject* floor = new PhysicsObject(
-		PRIMITIVE_MESH,
-		Globals::meshLibrary.getMesh(4),
+		PRIMITIVE_BOX,
+		Globals::meshLibrary.getMesh(1),
 		0.0f,0.1f,0.8f);
-	//floor->setScale(glm::vec3(10.0f,1.0f,10.0f));
+	floor->setScale(glm::vec3(10.0f,1.0f,10.0f));
 	physicsWorld->addObject(floor);
 
 	//balls
-	for(int i = 0; i < 50; i++)
+	for(int i = 0; i < 10; i++)
 	{
 		PhysicsObject* object;
 
-		int objectType = i % 2;
-		if(objectType == 0) //sphere
+		int objectType = i > 2;
+		if(objectType == 0) //concave
 		{
 			object = new PhysicsObject(
-				PRIMITIVE_SPHERE,
-				Globals::meshLibrary.getMesh(3),
+				PRIMITIVE_MESH,
+				Globals::meshLibrary.getMesh(4),
 				1.0f,0.1f,0.8f);
 		}
 		else if(objectType == 1) //cube
@@ -192,6 +199,7 @@ void initPhysics()
 		}
 		 
 		object->setTranslationY((float)(i*2) + 3.0f);
+		object->setTranslationX((float)(i));
 		physicsWorld->addObject(object);
 	}
 }

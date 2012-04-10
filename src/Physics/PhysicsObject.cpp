@@ -29,9 +29,19 @@ PhysicsObject::PhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh,
 			&baseMesh->positions[0],
 			vertexStride);
 
-		btVector3 aabbMin(-1000,-1000,-1000);
-		btVector3 aabbMax(1000,1000,1000);
-		this->collisionShape = new btBvhTriangleMeshShape(indexVertexArrays,true,aabbMin,aabbMax);
+		if(mass == 0)
+		{
+			float dim = 100;
+			btVector3 aabbMin(-dim,-dim,-dim);
+			btVector3 aabbMax(dim,dim,dim);
+			this->collisionShape = new btBvhTriangleMeshShape(indexVertexArrays,true,aabbMin,aabbMax);
+		}
+		else
+		{
+			btGImpactMeshShape * trimesh = new btGImpactMeshShape(indexVertexArrays);
+			trimesh->updateBound();
+			this->collisionShape = trimesh;
+		}
 	}
 	this->createRigidBody(mass,friction,restitution);
 }
