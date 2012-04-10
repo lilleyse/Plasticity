@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Mesh.h"
+#include "BaseMesh.h"
 #include <vector>
 #include "ColladaData.h"
 #include "Loader.h"
@@ -14,7 +14,7 @@ public:
 
 	void initialize();
 
-	std::vector<Mesh*> meshes;
+	std::vector<BaseMesh*> meshes;
 
-	Mesh* getMesh(int number);
+	BaseMesh* getMesh(int number);
 };

@@ -36,9 +36,10 @@ btRigidBody* PhysicsObject::getRigidBody()
 }
 
 //Mesh
-void PhysicsObject::attachMesh(Mesh* attachedMesh)
+void PhysicsObject::attachMesh(BaseMesh* baseMesh)
 {
-	this->attachedMesh = attachedMesh;
+	Mesh* mesh = new Mesh(*baseMesh);
+	this->attachedMesh = mesh;
 }
 Mesh* PhysicsObject::getAttachedMesh()
 {

@@ -24,7 +24,7 @@ public:
 	btRigidBody* getRigidBody();
 
 	//Mesh
-	void attachMesh(Mesh* attachedMesh);
+	void attachMesh(BaseMesh* baseMesh);
 	Mesh* getAttachedMesh();
 
 	//Mass
