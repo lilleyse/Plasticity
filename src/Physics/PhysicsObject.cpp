@@ -1,11 +1,16 @@
 #include "PhysicsObject.h"
 
+
 PhysicsObject::PhysicsObject(PRIMITIVE_TYPE type, float mass, float restitution, float friction)
 {
 	if(type == PRIMITIVE_BOX)
-		this->primitiveData = new PrimitiveDataBox(glm::vec3(1,1,1));
+	{
+		this->collisionShape = new btBoxShape(btVector3(1.0f,1.0f,1.0f));
+	}
 	else if(type == PRIMITIVE_SPHERE)
-		this->primitiveData = new PrimitiveDataSphere(1.0f);
+	{
+		this->collisionShape = new btSphereShape(1.0f);
+	}
 	this->createRigidBody(mass,friction,restitution);
 }
 PhysicsObject::~PhysicsObject(){}
@@ -14,15 +19,13 @@ PhysicsObject::~PhysicsObject(){}
 void PhysicsObject::createRigidBody(float mass, float friction, float restitution)
 {
 	bool isDynamic = (mass != 0.f);
-	btCollisionShape* collisionShape = this->primitiveData->collisionShape;
-
 	btVector3 localInertia(0,0,0);
 	if (isDynamic)
-		collisionShape->calculateLocalInertia(mass,localInertia);
+		this->collisionShape->calculateLocalInertia(mass,localInertia);
 
 	//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(btTransform::getIdentity());
-	btRigidBody::btRigidBodyConstructionInfo cInfo(mass,myMotionState,collisionShape,localInertia);
+	btRigidBody::btRigidBodyConstructionInfo cInfo(mass,myMotionState,this->collisionShape,localInertia);
 	this->rigidBody = new btRigidBody(cInfo);
 	this->rigidBody->setContactProcessingThreshold(BT_LARGE_FLOAT);
 	this->rigidBody->setFriction(friction);

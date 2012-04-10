@@ -4,13 +4,21 @@
 #include <glm/glm.hpp>
 
 #include "../Mesh.h"
-#include "PhysicsPrimitives.h"
 #include "PhysicsUtils.h"
 
 /*--------------------------------------
 PhysicsObject has physics properties for
 integration with Bullet.
 --------------------------------------*/
+
+enum PRIMITIVE_TYPE {
+	PRIMITIVE_BOX,       //box
+	PRIMITIVE_SPHERE,    //sphere
+	PRIMITIVE_CYLINDER,  //cylinder
+	PRIMITIVE_CONE,      //cone
+	PRIMITIVE_CAPSULE,   //capsule
+	PRIMITIVE_MESH,      //mesh
+};
 
 class PhysicsObject
 {
@@ -75,8 +83,8 @@ private:
 	void createRigidBody(float mass, float friction, float restitution);
 
 	Mesh* attachedMesh;
+	btCollisionShape* collisionShape;
 	btRigidBody* rigidBody;
-	PrimitiveData* primitiveData;
 	glm::mat4 transformationMatrix;
 };
 

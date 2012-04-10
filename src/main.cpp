@@ -176,12 +176,12 @@ void initPhysics()
 		int objectType = i % 2;
 		if(objectType == 0) //sphere
 		{
-			object = new PhysicsObject(PRIMITIVE_SPHERE, 1.0f,0.1f,0.8f);
+			object = new PhysicsObject(PRIMITIVE_SPHERE,1.0f,0.1f,0.8f);
 			object->attachMesh(Globals::meshLibrary.getMesh(3));
 		}
 		else if(objectType == 1) //cube
 		{
-			object = new PhysicsObject(PRIMITIVE_BOX, 1.0f,0.1f,0.8f);
+			object = new PhysicsObject(PRIMITIVE_BOX,1.0f,0.1f,0.8f);
 			object->attachMesh(Globals::meshLibrary.getMesh(1));
 		}
 		 
