@@ -18,6 +18,16 @@ BaseMesh::BaseMesh(std::vector<float>& positionData, std::vector<float>& normals
 		vertices[i].nz = normalsData[i*3 + 2];
 	}
 
+
+
 	this->elementArray = elementArray;
+
+	//convert unsigned short array to int array
+	this->elementArrayForBullet = std::vector<int>(elementArray.size());
+	for(unsigned int i = 0; i < elementArray.size(); i++)
+	{
+		elementArrayForBullet[i] = (int)elementArray[i];
+	}
+
 
 }

@@ -17,5 +17,6 @@ public:
 
 	std::vector<Vertex> vertices;
 	std::vector<unsigned short> elementArray;
+	std::vector<int> elementArrayForBullet;
 
 };
