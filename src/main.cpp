@@ -163,9 +163,11 @@ void initPhysics()
 	physicsWorld = new PhysicsWorld();
 
 	//ground plane
-	PhysicsObject* floor = new PhysicsObject(PRIMITIVE_BOX,0.0f,0.1f,0.8f);
-	floor->setScale(glm::vec3(10.0f,1.0f,10.0f));
-	floor->attachMesh(Globals::meshLibrary.getMesh(1));
+	PhysicsObject* floor = new PhysicsObject(
+		PRIMITIVE_MESH,
+		Globals::meshLibrary.getMesh(4),
+		0.0f,0.1f,0.8f);
+	//floor->setScale(glm::vec3(10.0f,1.0f,10.0f));
 	physicsWorld->addObject(floor);
 
 	//balls
@@ -176,13 +178,17 @@ void initPhysics()
 		int objectType = i % 2;
 		if(objectType == 0) //sphere
 		{
-			object = new PhysicsObject(PRIMITIVE_SPHERE,1.0f,0.1f,0.8f);
-			object->attachMesh(Globals::meshLibrary.getMesh(3));
+			object = new PhysicsObject(
+				PRIMITIVE_SPHERE,
+				Globals::meshLibrary.getMesh(3),
+				1.0f,0.1f,0.8f);
 		}
 		else if(objectType == 1) //cube
 		{
-			object = new PhysicsObject(PRIMITIVE_BOX,1.0f,0.1f,0.8f);
-			object->attachMesh(Globals::meshLibrary.getMesh(1));
+			object = new PhysicsObject(
+				PRIMITIVE_BOX,
+				Globals::meshLibrary.getMesh(1),
+				1.0f,0.1f,0.8f);
 		}
 		 
 		object->setTranslationY((float)(i*2) + 3.0f);
