@@ -114,4 +114,5 @@ void main()
 	vec4 gamma = vec4(1.0 / Lgt.gamma);
 	gamma.w = 1.0;
 	fragColor = pow(accumLighting, gamma);
+
 }

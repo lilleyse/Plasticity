@@ -11,9 +11,15 @@ layout(binding = 0) uniform Projection
 	mat4 projectionMatrix;
 };
 
+struct ModelViewStruct
+{
+	mat4 normalMatrix;
+	mat4 matrix;
+};
+
 layout(binding = 1) uniform ModelView
 {
-	mat4 modelViewMatrix;
+	ModelViewStruct modelView;
 };
 
 
@@ -47,9 +53,9 @@ out Vertex
 
 void main()
 {
-	vec4 tempCamPosition = (modelViewMatrix * vec4(position, 1.0));
+	vec4 tempCamPosition = (modelView.matrix * vec4(position, 1.0));
 	gl_Position = projectionMatrix * tempCamPosition;
 
-	vertexOut.vertexNormal = normalize(mat3(modelViewMatrix) * normal);
+	vertexOut.vertexNormal = normalize(mat3(modelView.normalMatrix) * normal);
 	vertexOut.cameraSpacePosition = vec3(tempCamPosition);
 }

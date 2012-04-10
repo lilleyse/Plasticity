@@ -8,6 +8,7 @@
 #include "Physics/PhysicsWorld.h"
 #include "Physics/PhysicsObject.h"
 
+
 namespace
 {
 	glm::mat4 projectionMatrix;
@@ -18,19 +19,26 @@ namespace
 	int height;
 
 	GLuint projectionUBO;
-	GLuint projectionBindingIndex;
+	GLuint projectionBindingIndex = 0;
+	
+	struct ModelViewStruct
+	{
+		glm::mat4 normalMatrix;
+		glm::mat4 matrix;
+		
+	};
 
 	GLuint modelViewUBO;
-	GLuint modelViewBindingIndex;
-
-	GLuint lightingUBO;
-	GLuint lightingBindingIndex;
+	GLuint modelViewBindingIndex = 1;
 
 	GLuint numLightsUBO;
-	GLuint numLightsBindingIndex;
+	GLuint numLightsBindingIndex = 3;
+	
+	GLuint lightingUBO;
+	GLuint lightingBindingIndex = 4;
 
 	GLuint materialUBO;
-	GLuint materialBindingIndex;
+	GLuint materialBindingIndex = 5;
 
 	//material
 
@@ -106,13 +114,11 @@ void initGL()
 	glGenBuffers(1, &projectionUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, projectionUBO);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
-	projectionBindingIndex = 0;
     glBindBufferBase(GL_UNIFORM_BUFFER, projectionBindingIndex, projectionUBO);
 
 	glGenBuffers(1, &modelViewUBO);
 	glBindBuffer(GL_UNIFORM_BUFFER, modelViewUBO);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), NULL, GL_STREAM_DRAW);
-	modelViewBindingIndex = 1;
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(ModelViewStruct), NULL, GL_STREAM_DRAW);
 	glBindBufferBase(GL_UNIFORM_BUFFER, modelViewBindingIndex, modelViewUBO);
 
 	//init lighting
@@ -122,7 +128,6 @@ void initGL()
 	glGenBuffers(1, &numLightsUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, numLightsUBO);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(int), &numActiveLights, GL_STATIC_DRAW);
-	numLightsBindingIndex = 3;
     glBindBufferBase(GL_UNIFORM_BUFFER, numLightsBindingIndex, numLightsUBO);
 
 	GL_Lighting lightingGL;
@@ -137,7 +142,6 @@ void initGL()
 	glGenBuffers(1, &lightingUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, lightingUBO);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_Lighting), &lightingGL, GL_STATIC_DRAW);
-	lightingBindingIndex = 4;
     glBindBufferBase(GL_UNIFORM_BUFFER, lightingBindingIndex, lightingUBO);
 
 	//init material
@@ -150,7 +154,6 @@ void initGL()
 	glGenBuffers(1, &materialUBO);
 	glBindBuffer(GL_UNIFORM_BUFFER, materialUBO);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(MaterialBlock), &material, GL_STATIC_DRAW);
-	materialBindingIndex = 5;
 	glBindBufferBase(GL_UNIFORM_BUFFER, materialBindingIndex, materialUBO);
 
 	//init other things
@@ -176,12 +179,12 @@ void initPhysics()
 		int objectType = i % 2;
 		if(objectType == 0) //sphere
 		{
-			object = new PhysicsObject(PRIMITIVE_SPHERE,1.0f,0.1f,0.8f);
+			object = new PhysicsObject(PRIMITIVE_SPHERE, 1.0f,0.1f,0.8f);
 			object->attachMesh(Globals::meshLibrary.getMesh(3));
 		}
 		else if(objectType == 1) //cube
 		{
-			object = new PhysicsObject(PRIMITIVE_BOX,1.0f,0.1f,0.8f);
+			object = new PhysicsObject(PRIMITIVE_BOX, 1.0f,0.1f,0.8f);
 			object->attachMesh(Globals::meshLibrary.getMesh(1));
 		}
 		 
@@ -214,23 +217,28 @@ void enterFrame()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	Globals::shaderState.prepareForRender();
-	glBindBuffer(GL_UNIFORM_BUFFER, modelViewUBO);
 	
 	physicsWorld->update();
 	std::vector<PhysicsObject*>& objects = physicsWorld->getObjects();
 	for(unsigned int i = 0; i < objects.size(); i++)
 	{
-		glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), 
-				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-
+		//get model view matrix
 		PhysicsObject* object = objects.at(i);
 		object->updateTransformationMatrix();
 		glm::mat4 model = object->getTransformationMatrix();
 		glm::mat4 view = Globals::viewMatrix;
 		glm::mat4 modelView = view * model;
-		*Pointer = modelView;
+		ModelViewStruct modelViewStruct;
+		modelViewStruct.matrix = modelView;
+		modelViewStruct.normalMatrix = glm::mat4(glm::transpose(glm::inverse(glm::mat3(modelView))));
 
+		glBindBuffer(GL_UNIFORM_BUFFER, modelViewUBO);
+		ModelViewStruct* modelViewPointer = (ModelViewStruct*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(ModelViewStruct), 
+				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+		
+		*modelViewPointer = modelViewStruct;
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
+
 		object->getAttachedMesh()->render();
 	}
 }
