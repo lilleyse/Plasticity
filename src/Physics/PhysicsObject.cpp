@@ -29,20 +29,22 @@ PhysicsObject::PhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh,
 			(float*)attachedMesh->getVertices(),
 			vertexStride);
 
-		/*if(mass == 0)
+		if(mass == 0)
 		{
 			float dim = 100;
 			btVector3 aabbMin(-dim,-dim,-dim);
 			btVector3 aabbMax(dim,dim,dim);
-			this->collisionShape = new btBvhTriangleMeshShape(indexVertexArrays,true,aabbMin,aabbMax);
+			btBvhTriangleMeshShape* trimesh = new btBvhTriangleMeshShape(indexVertexArrays,true,aabbMin,aabbMax);
+			trimesh->setUserPointer(this->getAttachedMesh());
+			this->collisionShape = trimesh;
 		}
 		else
-		{*/
+		{
 			btGImpactMeshShape * trimesh = new btGImpactMeshShape(indexVertexArrays);
 			trimesh->updateBound();
 			trimesh->setUserPointer(this->getAttachedMesh());
 			this->collisionShape = trimesh;
-		//}
+		}
 	}
 	this->createRigidBody(mass,friction,restitution);
 }

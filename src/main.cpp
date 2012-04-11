@@ -188,11 +188,23 @@ void initPhysics()
 
 	//Bullet
 	PhysicsObject* bullet = new PhysicsObject(
-		PRIMITIVE_BOX,
-		Globals::meshLibrary.getMesh(1),
+		PRIMITIVE_SPHERE,
+		Globals::meshLibrary.getMesh(3),
 		1.0f,0.1f,0.7f);
 	//bullet->setScale(.2f);
 	bullet->setTranslation(glm::vec3(0,10,0));
+	physicsWorld->addObject(bullet);
+}
+void shootBall()
+{
+	PhysicsObject* bullet = new PhysicsObject(
+		PRIMITIVE_SPHERE,
+		Globals::meshLibrary.getMesh(3),
+		1.0f,0.1f,0.7f);
+	//bullet->setScale(.2f);
+	float forceAmount = 1000.0f;
+	bullet->setTranslation(camera.getCameraPos());
+	bullet->getRigidBody()->applyCentralForce(Utils::convertGLMVectorToBullet(forceAmount*camera.getLookDir()));
 	physicsWorld->addObject(bullet);
 }
 void resize(int w, int h)
@@ -326,6 +338,8 @@ int main (int argc, char **argv)
 
 					if(myEvent.MouseButton.Button == sf::Mouse::Left)
 					{
+						if(window->GetInput().IsKeyDown(sf::Key::LControl))
+							shootBall();
 						mouseDown = true;
 						prevMouseX = myEvent.MouseButton.X;
 						prevMouseY = myEvent.MouseButton.Y;

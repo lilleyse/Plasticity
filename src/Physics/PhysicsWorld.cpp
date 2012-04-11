@@ -28,24 +28,37 @@ void PhysicsWorld::update()
 		btCollisionObject* obA = static_cast<btCollisionObject*>(contactManifold->getBody0());
 		btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
 		
+		bool swapped = false;
 		if(obB->getCollisionShape()->isConcave())
-			obA = obB;
-
-		int numContacts = contactManifold->getNumContacts();
-		for (int j=0;j<numContacts;j++)
 		{
-			btManifoldPoint& pt = contactManifold->getContactPoint(j);
-			float impulse = pt.getAppliedImpulse();
-			if (pt.getDistance() < 0.f && impulse > 1.0f)
-			{
-				const btVector3& ptA = pt.getPositionWorldOnA();
-				const btVector3& ptB = pt.getPositionWorldOnB();
+			obA = obB;
+			swapped = true;
+		}
 
-				std::cout << "Impulse: " << impulse << std::endl;
-				if(obA->getCollisionShape()->isConcave())
+
+		if(obA->getCollisionShape()->isConcave())
+		{
+			int numContacts = contactManifold->getNumContacts();
+			for (int j=0;j<numContacts;j++)
+			{
+				btManifoldPoint& pt = contactManifold->getContactPoint(j);
+				float impulse = pt.getAppliedImpulse();
+				if (pt.getDistance() < 0.f && impulse > .05f)
 				{
+					const btVector3& ptA = pt.getPositionWorldOnA();
+					const btVector3& ptB = pt.getPositionWorldOnB();
+
+					std::cout << "Impulse: " << impulse << std::endl;
+				
 					int indexA = pt.m_index0;
 					btVector3 normalOnA = -pt.m_normalWorldOnB;
+					if(swapped)
+					{
+						indexA = pt.m_index1;
+						normalOnA = pt.m_normalWorldOnB;
+					}
+					
+					
 					std::cout << "A: ";
 					std::cout << "normal: ";
 					Utils::printVec3(Utils::convertBulletVectorToGLM(normalOnA));
@@ -60,7 +73,9 @@ void PhysicsWorld::update()
 					for(int i = 0; i < 3; i++)
 					{
 						int index = elements[indexA*3+i];
-						float magnitude = -1.5f;
+						float magnitude = -impulse*.05f;
+						if(magnitude < -.1f)
+							magnitude = -.1f;
 						vertices[index].x += normalOnA.getX()*magnitude;
 						vertices[index].y += normalOnA.getY()*magnitude;
 						vertices[index].z += normalOnA.getZ()*magnitude;
@@ -77,6 +92,7 @@ void PhysicsWorld::update()
 					//trimesh->postUpdate();
 					//trimeshe->partialRefitTree(aabbMin,aabbMax);
 					//this->dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(obA->getBroadphaseHandle(),this->dynamicsWorld->getDispatcher());
+					
 				}
 			}
 		}
