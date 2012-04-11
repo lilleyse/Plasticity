@@ -17,7 +17,7 @@ PhysicsObject::PhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh,
 	else if(type == PRIMITIVE_MESH)
 	{
 		int numTriangles = baseMesh->elementArray.size()/3;
-		int vertexStride = 3*sizeof(float);
+		int vertexStride = sizeof(Vertex);
 		int indexStride = 3*sizeof(int);
 		int numVertices = baseMesh->vertices.size();
 
@@ -26,20 +26,21 @@ PhysicsObject::PhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh,
 			&baseMesh->elementArrayForBullet[0],
 			indexStride,
 			numVertices,
-			&baseMesh->positions[0],
+			(float*)&baseMesh->vertices[0],
 			vertexStride);
 
-		//if(mass == 0)
-		//{
-		//	float dim = 100;
-		//	btVector3 aabbMin(-dim,-dim,-dim);
-		//	btVector3 aabbMax(dim,dim,dim);
-		//	this->collisionShape = new btBvhTriangleMeshShape(indexVertexArrays,true,aabbMin,aabbMax);
-		//}
-		//else
-		//{
+		/*if(mass == 0)
+		{
+			float dim = 100;
+			btVector3 aabbMin(-dim,-dim,-dim);
+			btVector3 aabbMax(dim,dim,dim);
+			this->collisionShape = new btBvhTriangleMeshShape(indexVertexArrays,true,aabbMin,aabbMax);
+		}
+		else
+		{*/
 			btGImpactMeshShape * trimesh = new btGImpactMeshShape(indexVertexArrays);
 			trimesh->updateBound();
+			trimesh->setUserPointer(this->getAttachedMesh());
 			this->collisionShape = trimesh;
 		//}
 	}

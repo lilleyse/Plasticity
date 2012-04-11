@@ -106,8 +106,10 @@ void initGL()
     projectionMatrix[2].w = -1.0f;
     projectionMatrix[3].z = (2 * fzFar * fzNear) / (fzNear - fzFar);
 
-	glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	//glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
 	glEnable(GL_DEPTH_TEST);
@@ -181,15 +183,16 @@ void initPhysics()
 		PRIMITIVE_MESH,
 		Globals::meshLibrary.getMesh(5),
 		0.0f,0.1f,0.8f);
-	floor->setScale(glm::vec3(1.0f,1.0f,1.0f));
+	//floor->setScale(glm::vec3(1.0f,1.0f,1.0f));
 	physicsWorld->addObject(floor);
 
 	//Bullet
 	PhysicsObject* bullet = new PhysicsObject(
-		PRIMITIVE_MESH,
-		Globals::meshLibrary.getMesh(3),
+		PRIMITIVE_BOX,
+		Globals::meshLibrary.getMesh(1),
 		1.0f,0.1f,0.7f);
-	bullet->setTranslationY(10);
+	//bullet->setScale(.2f);
+	bullet->setTranslation(glm::vec3(0,10,0));
 	physicsWorld->addObject(bullet);
 }
 void resize(int w, int h)

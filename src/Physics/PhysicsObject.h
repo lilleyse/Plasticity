@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include <bullet/btBulletDynamicsCommon.h>
 #include <bullet/BulletCollision/Gimpact/btGImpactShape.h>
 #include <bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
@@ -7,6 +9,7 @@
 
 #include "../Mesh.h"
 #include "PhysicsUtils.h"
+#include "../Utils.h"
 
 /*--------------------------------------
 PhysicsObject has physics properties for

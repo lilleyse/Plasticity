@@ -17,10 +17,12 @@ public:
 	~Mesh();
 
 	void render();
+	void updateVertices(Vertex* vertexData);
 
 private:
 
 	int numElements;
+	int numVertices;
 	GLuint vertexArrayObject;
 	GLuint arrayBufferObject;
 	GLuint elementBufferObject;

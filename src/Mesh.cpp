@@ -5,7 +5,7 @@ Mesh::Mesh(BaseMesh& baseMesh)
 	
 	//create opengl mesh based on the positions
 	
-	int numVertices = baseMesh.vertices.size();
+	numVertices = baseMesh.vertices.size();
 	numElements = baseMesh.elementArray.size();
 
 	//create and bind array buffer, set data
@@ -51,6 +51,13 @@ Mesh::Mesh(BaseMesh& baseMesh)
 Mesh::~Mesh()
 {
 
+}
+
+
+void Mesh::updateVertices(Vertex* vertexData)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, arrayBufferObject);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex)*numVertices, vertexData);
 }
 
 void Mesh::render()

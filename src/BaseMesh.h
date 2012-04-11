@@ -16,7 +16,6 @@ public:
 	BaseMesh(std::vector<float>& positionData, std::vector<float>& normalsData, std::vector<unsigned short>& elementArray);
 
 	std::vector<Vertex> vertices;
-	std::vector<float> positions;
 	std::vector<unsigned short> elementArray;
 	std::vector<int> elementArrayForBullet;
 

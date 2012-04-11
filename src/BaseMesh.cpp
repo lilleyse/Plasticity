@@ -2,9 +2,7 @@
 
 
 BaseMesh::BaseMesh(std::vector<float>& positionData, std::vector<float>& normalsData, std::vector<unsigned short>& elementArray)
-{
-	this->positions = positionData;
-	
+{	
 	int numVertices = positionData.size()/3;
 	vertices = std::vector<Vertex>(numVertices);	
 	for(int i = 0; i < numVertices; i++)
