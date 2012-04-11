@@ -30,7 +30,7 @@ void MeshLibrary::initialize()
 
 	filename = "data/meshes/subdividedFloor.dae";
 	data = Loader::readColladaAsset(Utils::getFilePath(filename));
-	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray));
+	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray,true));
 }
 
 BaseMesh* MeshLibrary::getMesh(int number)

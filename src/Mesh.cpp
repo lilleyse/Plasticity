@@ -1,23 +1,28 @@
 #include "Mesh.h"
 
-Mesh::Mesh(BaseMesh& baseMesh)
+Mesh::Mesh(BaseMesh* baseMesh)
 {
-	
+
+	numVertices = baseMesh->vertices.size();
+	numElements = baseMesh->elementArray.size();
+
+	this->baseMesh = baseMesh;
+	vertices = new Vertex[numVertices];
+	memcpy(vertices, &baseMesh->vertices[0], sizeof(Vertex)*numVertices);
 	//create opengl mesh based on the positions
 	
-	numVertices = baseMesh.vertices.size();
-	numElements = baseMesh.elementArray.size();
+	
 
 	//create and bind array buffer, set data
     glGenBuffers(1, &arrayBufferObject);
     glBindBuffer(GL_ARRAY_BUFFER, arrayBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*numVertices, &baseMesh.vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*numVertices, vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     //create and bind element array buffer, set data to the stored element array, then close buffer
     glGenBuffers(1, &elementBufferObject);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort)*numElements, &baseMesh.elementArray[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort)*numElements, &baseMesh->elementArray[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	//create and bind vao
@@ -53,11 +58,19 @@ Mesh::~Mesh()
 
 }
 
+Vertex* Mesh::getVertices()
+{
+	return this->vertices;
+}
+int* Mesh::getElements()
+{
+	return &this->baseMesh->elementArrayForBullet[0];
+}
 
-void Mesh::updateVertices(Vertex* vertexData)
+void Mesh::updateVertices()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, arrayBufferObject);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex)*numVertices, vertexData);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex)*numVertices, vertices);
 }
 
 void Mesh::render()
@@ -65,4 +78,35 @@ void Mesh::render()
 	glBindVertexArray(vertexArrayObject);
     glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_SHORT, 0);
     glBindVertexArray(0);
+}
+
+void Mesh::updateNormal(int index)
+{
+	Vertex& vertex = this->vertices[index];
+	glm::vec3 position = glm::vec3(vertex.x,vertex.y,vertex.z);
+	std::vector<int>& neighbors = this->baseMesh->getNeighbors(index);
+	glm::vec3 newNormal = glm::vec3(0,0,0);
+
+	std::vector<int>::iterator iter;
+	for(int i = 0; i < neighbors.size(); i+=2)
+	{
+		Vertex& neighbor1 = this->vertices[neighbors[i]];
+		Vertex& neighbor2 = this->vertices[neighbors[i+1]];
+		glm::vec3 neighbor1Pos = glm::vec3(neighbor1.x,neighbor1.y,neighbor1.z);
+		glm::vec3 neighbor2Pos = glm::vec3(neighbor2.x,neighbor2.y,neighbor2.z);
+		glm::vec3 edge1 = glm::normalize(position - neighbor1Pos);
+		glm::vec3 edge2 = glm::normalize(position - neighbor2Pos);
+		glm::vec3 cross = glm::cross(edge1,edge2);
+		newNormal += cross;
+	}
+	newNormal = glm::normalize(newNormal);
+	vertex.nx = newNormal.x;
+	vertex.ny = newNormal.y;
+	vertex.nz = newNormal.z;
+}
+void Mesh::updateNeighborNormals(int index)
+{
+	std::vector<int>& neighbors = this->baseMesh->getNeighbors(index);
+	for(int i = 0; i < neighbors.size(); i++)
+		this->updateNormal(neighbors[i]);
 }

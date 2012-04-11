@@ -4,7 +4,7 @@
 PhysicsObject::PhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh,
 	float mass, float restitution, float friction)
 {
-	this->attachedMesh = new Mesh(*baseMesh);
+	this->attachedMesh = new Mesh(baseMesh);
 
 	if(type == PRIMITIVE_BOX)
 	{
@@ -23,10 +23,10 @@ PhysicsObject::PhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh,
 
 		btTriangleIndexVertexArray* indexVertexArrays = new btTriangleIndexVertexArray(
 			numTriangles,
-			&baseMesh->elementArrayForBullet[0],
+			attachedMesh->getElements(),
 			indexStride,
 			numVertices,
-			(float*)&baseMesh->vertices[0],
+			(float*)attachedMesh->getVertices(),
 			vertexStride);
 
 		/*if(mass == 0)

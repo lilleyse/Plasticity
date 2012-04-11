@@ -51,37 +51,28 @@ void PhysicsWorld::update()
 					Utils::printVec3(Utils::convertBulletVectorToGLM(normalOnA));
 					std::cout << "index: " << indexA << std::endl;
 
-					//Update vertex
-					btTriangleIndexVertexArray* triArray = 0;
 					btCollisionShape* trimesh = obA->getCollisionShape();
-					if(dynamic_cast<btGImpactMeshShape*>(trimesh) != 0)
-						triArray = (btTriangleIndexVertexArray*)(((btGImpactMeshShape*)trimesh)->getMeshInterface());
-					if(dynamic_cast<btBvhTriangleMeshShape*>(trimesh) != 0)
-						triArray = (btTriangleIndexVertexArray*)(((btBvhTriangleMeshShape*)trimesh)->getMeshInterface());
-					
-					int triangle[3];
-					for(int i = 0; i < 3; i++)
-					{
-						triArray->getIndexedMeshArray()[0];
-						triangle[i] = ((int*)triArray->getIndexedMeshArray()[0].m_triangleIndexBase)[indexA*3+i];
-					}
-
-					Vertex* vertexData = ((Vertex*)triArray->getIndexedMeshArray()[0].m_vertexBase);
-					for(int i = 0; i < 3; i++)
-					{
-						int index = triangle[i];
-						//std::cout << "vertex: ";
-						//Utils::printVec3(glm::vec3(vertexData[triangle[2]].x, vertexData[triangle[2]].y, vertexData[triangle[2]].z));
-						
-						float magnitude = -0.5f;
-						vertexData[index].x += normalOnA.getX()*magnitude;
-						vertexData[index].y += normalOnA.getY()*magnitude;
-						vertexData[index].z += normalOnA.getZ()*magnitude;
-					}
-
 					Mesh* renderMesh = (Mesh*)trimesh->getUserPointer();
-					renderMesh->updateVertices(vertexData);
+					Vertex* vertices = renderMesh->getVertices();
+					int* elements = renderMesh->getElements();
 
+					//Update vertex
+					for(int i = 0; i < 3; i++)
+					{
+						int index = elements[indexA*3+i];
+						float magnitude = -1.5f;
+						vertices[index].x += normalOnA.getX()*magnitude;
+						vertices[index].y += normalOnA.getY()*magnitude;
+						vertices[index].z += normalOnA.getZ()*magnitude;
+					}
+					for(int i = 0; i < 3; i++)
+					{
+						int index = elements[indexA*3+i];
+						renderMesh->updateNormal(index);
+						renderMesh->updateNeighborNormals(index);
+					}
+
+					renderMesh->updateVertices();
 					//Clean the intersections
 					//trimesh->postUpdate();
 					//trimeshe->partialRefitTree(aabbMin,aabbMax);

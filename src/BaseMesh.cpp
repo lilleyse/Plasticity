@@ -1,7 +1,7 @@
 #include "BaseMesh.h"
 
 
-BaseMesh::BaseMesh(std::vector<float>& positionData, std::vector<float>& normalsData, std::vector<unsigned short>& elementArray)
+BaseMesh::BaseMesh(std::vector<float>& positionData, std::vector<float>& normalsData, std::vector<unsigned short>& elementArray, bool initializeNeighbors)
 {	
 	int numVertices = positionData.size()/3;
 	vertices = std::vector<Vertex>(numVertices);	
@@ -16,8 +16,6 @@ BaseMesh::BaseMesh(std::vector<float>& positionData, std::vector<float>& normals
 		vertices[i].nz = normalsData[i*3 + 2];
 	}
 
-
-
 	this->elementArray = elementArray;
 
 	//convert unsigned short array to int array
@@ -27,5 +25,43 @@ BaseMesh::BaseMesh(std::vector<float>& positionData, std::vector<float>& normals
 		elementArrayForBullet[i] = (int)elementArray[i];
 	}
 
+	if(initializeNeighbors)
+		this->initializeNeighbors();
+}
 
+void BaseMesh::initializeNeighbors()
+{
+	for(unsigned int i = 0; i < elementArrayForBullet.size(); i++)
+	{
+		int currentIndex = elementArrayForBullet.at(i);
+		for(unsigned int j = 0; j < elementArrayForBullet.size(); j+=3)
+		{
+			bool inSameTriangle = false;
+			for(unsigned int k = 0; k < 3; k++)
+			{
+				int otherIndex = elementArrayForBullet.at(j+k);
+				if(otherIndex == currentIndex)
+				{
+					inSameTriangle = true;
+					break;
+				}
+			}
+			if(inSameTriangle)
+			{
+				for(unsigned int k = 0; k < 3; k++)
+				{
+					int otherIndex = elementArrayForBullet.at(j+k);
+					if(otherIndex != currentIndex)
+					{
+						elementNeighbors[currentIndex].push_back(otherIndex);
+					}
+				}
+			}
+		}
+	}
+}
+
+std::vector<int>& BaseMesh::getNeighbors(int index)
+{
+	return this->elementNeighbors.at(index);
 }
