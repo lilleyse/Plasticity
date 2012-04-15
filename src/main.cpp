@@ -87,6 +87,7 @@ namespace
 
 	//Physics
 	PhysicsWorld* physicsWorld;
+	bool paused = false;
 }
 
 void initGL()
@@ -106,7 +107,7 @@ void initGL()
     projectionMatrix[2].w = -1.0f;
     projectionMatrix[3].z = (2 * fzFar * fzNear) / (fzNear - fzFar);
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -233,7 +234,8 @@ void enterFrame()
 
 	Globals::shaderState.prepareForRender();
 	
-	physicsWorld->update();
+	if(!paused)
+		physicsWorld->update();
 	std::vector<PhysicsObject*>& objects = physicsWorld->getObjects();
 	for(unsigned int i = 0; i < objects.size(); i++)
 	{
@@ -279,7 +281,7 @@ int main (int argc, char **argv)
 
 	resize(width, height);
 
-	bool paused = false;
+	
 
 	bool mouseDown = false;
 	int prevMouseX = 0;
@@ -300,8 +302,7 @@ int main (int argc, char **argv)
 			clock.Reset();
 		}
 
-		if(!paused)
-			enterFrame();
+		enterFrame();
 
         window->Display();
 
@@ -338,11 +339,13 @@ int main (int argc, char **argv)
 
 					if(myEvent.MouseButton.Button == sf::Mouse::Left)
 					{
-						if(window->GetInput().IsKeyDown(sf::Key::LControl))
-							shootBall();
 						mouseDown = true;
 						prevMouseX = myEvent.MouseButton.X;
 						prevMouseY = myEvent.MouseButton.Y;
+					}
+					else if(myEvent.MouseButton.Button == sf::Mouse::Right)
+					{
+						shootBall();
 					}
 					break;
 

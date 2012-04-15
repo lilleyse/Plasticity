@@ -67,6 +67,11 @@ int* Mesh::getElements()
 	return &this->baseMesh->elementArrayForBullet[0];
 }
 
+BaseMesh* Mesh::getBaseMesh()
+{
+	return this->baseMesh;
+}
+
 void Mesh::updateVertices()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, arrayBufferObject);
@@ -87,8 +92,7 @@ void Mesh::updateNormal(int index)
 	std::vector<int>& neighbors = this->baseMesh->getNeighbors(index);
 	glm::vec3 newNormal = glm::vec3(0,0,0);
 
-	std::vector<int>::iterator iter;
-	for(int i = 0; i < neighbors.size(); i+=2)
+	for(unsigned int i = 0; i < neighbors.size(); i+=2)
 	{
 		Vertex& neighbor1 = this->vertices[neighbors[i]];
 		Vertex& neighbor2 = this->vertices[neighbors[i+1]];
@@ -107,6 +111,6 @@ void Mesh::updateNormal(int index)
 void Mesh::updateNeighborNormals(int index)
 {
 	std::vector<int>& neighbors = this->baseMesh->getNeighbors(index);
-	for(int i = 0; i < neighbors.size(); i++)
+	for(unsigned int i = 0; i < neighbors.size(); i++)
 		this->updateNormal(neighbors[i]);
 }

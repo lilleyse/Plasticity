@@ -21,6 +21,7 @@ public:
 
 	Vertex* getVertices();
 	int* getElements();
+	BaseMesh* getBaseMesh();
 
 	void updateVertices(); //updates the vbo
 	void updateNormal(int index);
