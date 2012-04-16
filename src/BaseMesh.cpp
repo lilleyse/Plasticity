@@ -31,9 +31,16 @@ BaseMesh::BaseMesh(std::vector<float>& positionData, std::vector<float>& normals
 
 void BaseMesh::initializeNeighbors()
 {
-	for(unsigned int i = 0; i < elementArrayForBullet.size(); i++)
+	int largestIndex = 0;
+	for (unsigned int i = 0; i < elementArrayForBullet.size(); i++)
 	{
 		int currentIndex = elementArrayForBullet.at(i);
+		if(currentIndex > largestIndex)
+			largestIndex = currentIndex;
+	}
+	for(unsigned int i = 0; i < largestIndex; i++)
+	{
+		int currentIndex = i;
 		for(unsigned int j = 0; j < elementArrayForBullet.size(); j+=3)
 		{
 			bool inSameTriangle = false;

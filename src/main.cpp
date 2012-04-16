@@ -107,7 +107,7 @@ void initGL()
     projectionMatrix[2].w = -1.0f;
     projectionMatrix[3].z = (2 * fzFar * fzNear) / (fzNear - fzFar);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
