@@ -17,6 +17,7 @@ public:
 	void addObject(PhysicsObject* object);
 	void update();
 	void processCollisions();
+	void processCollision(btRigidBody* ob, btManifoldPoint& pt, int triIndex, btVector3& pos, btVector3& normal);
 	std::vector<PhysicsObject*>& getObjects();
 
 	btDefaultCollisionConfiguration* collisionConfiguration;

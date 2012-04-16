@@ -107,8 +107,6 @@ void initGL()
     projectionMatrix[2].w = -1.0f;
     projectionMatrix[3].z = (2 * fzFar * fzNear) / (fzNear - fzFar);
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
 	glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
@@ -182,9 +180,9 @@ void initPhysics()
 	//ground plane
 	PhysicsObject* floor = new PhysicsObject(
 		PRIMITIVE_MESH,
-		Globals::meshLibrary.getMesh(5),
+		Globals::meshLibrary.getMesh(3),
 		0.0f,0.1f,0.8f);
-	//floor->setScale(glm::vec3(1.0f,1.0f,1.0f));
+	floor->setScale(glm::vec3(4.0f,4.0f,4.0f));
 	physicsWorld->addObject(floor);
 
 	//Bullet
@@ -260,6 +258,13 @@ void enterFrame()
 	}
 }
 
+void drawWireframe(bool enable)
+{
+	if(enable)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
 
 /*-----------------------------
 		Input/Output 
@@ -281,7 +286,7 @@ int main (int argc, char **argv)
 
 	resize(width, height);
 
-	
+	bool wireframe = false;
 
 	bool mouseDown = false;
 	int prevMouseX = 0;
@@ -309,19 +314,19 @@ int main (int argc, char **argv)
 		
 		if(window->GetInput().IsKeyDown(sf::Key::W))
 		{
-			camera.zoom(2);
+			//camera.zoom(2);
 		}
 		else if(window->GetInput().IsKeyDown(sf::Key::S))
 		{
-			camera.zoom(-1);
+			//camera.zoom(-1);
 		}
 		else if(window->GetInput().IsKeyDown(sf::Key::A))
 		{
-			camera.pan(-1, 0);
+			//camera.pan(-1, 0);
 		}
 		else if(window->GetInput().IsKeyDown(sf::Key::D))
 		{
-			camera.pan(1, 0);
+			//camera.pan(1, 0);
 		}
 
 
@@ -388,6 +393,11 @@ int main (int argc, char **argv)
 					if(myEvent.Key.Code == sf::Key::Space)
 					{
 						paused = !paused;
+					}
+					else if(myEvent.Key.Code == sf::Key::W)
+					{
+						wireframe = !wireframe;
+						drawWireframe(wireframe);
 					}
 					break;
 
