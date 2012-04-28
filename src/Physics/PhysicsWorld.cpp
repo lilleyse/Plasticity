@@ -92,7 +92,7 @@ void PhysicsWorld::processCollisions()
 
 					//Update the positions for all neighbors around the intersection point
 					float range = 1.5f;
-					float magnitude = -impulse*.05f;
+					float magnitude = -impulse*.04f;
 					std::vector<int> neighbors = renderMesh->getBaseMesh()->getNeighbors(bestIndex);
 					neighbors.push_back(bestIndex);
 
