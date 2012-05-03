@@ -10,7 +10,7 @@
 #include "Globals.h"
 #include "Cameras/Camera3rdPerson.h"
 #include "Physics/PhysicsWorld.h"
-#include "Physics/PhysicsObject.h"
+#include "Physics/RigidPhysicsObject.h"
 
 
 namespace
@@ -174,37 +174,35 @@ void initPhysics()
 {
 	physicsWorld = new PhysicsWorld();
 
-	btCollisionDispatcher * dispatcher = static_cast<btCollisionDispatcher *>(physicsWorld->dynamicsWorld->getDispatcher());
+	btCollisionDispatcher * dispatcher = static_cast<btCollisionDispatcher *>(physicsWorld->world->getDispatcher());
 	btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
 
 	//ground plane
-	PhysicsObject* floor = new PhysicsObject(
+	RigidPhysicsObject* floor = new RigidPhysicsObject(
 		PRIMITIVE_MESH,
-		Globals::meshLibrary.getMesh(3),
-		0.0f,0.1f,0.8f);
-	floor->setScale(glm::vec3(4.0f,4.0f,4.0f));
-	physicsWorld->addObject(floor);
+		Globals::meshLibrary.getMesh(5),
+		0.0f,0.9f,0.8f);
+	floor->translateY(-3.0f);
+	physicsWorld->addRigidObject(floor);
 
 	//Bullet
-	PhysicsObject* bullet = new PhysicsObject(
-		PRIMITIVE_SPHERE,
+	RigidPhysicsObject* bullet = new RigidPhysicsObject(
+		PRIMITIVE_MESH,
 		Globals::meshLibrary.getMesh(3),
-		1.0f,0.1f,0.7f);
-	//bullet->setScale(.2f);
+		1.0f,0.9f,0.7f);
 	bullet->setTranslation(glm::vec3(0,10,0));
-	physicsWorld->addObject(bullet);
+	physicsWorld->addRigidObject(bullet);
 }
 void shootBall()
 {
-	PhysicsObject* bullet = new PhysicsObject(
+	RigidPhysicsObject* bullet = new RigidPhysicsObject(
 		PRIMITIVE_SPHERE,
 		Globals::meshLibrary.getMesh(3),
-		1.0f,0.1f,0.7f);
-	//bullet->setScale(.2f);
+		1.0f,0.9f,0.7f);
 	float forceAmount = 1000.0f;
 	bullet->setTranslation(camera.getCameraPos());
-	bullet->getRigidBody()->applyCentralForce(Utils::convertGLMVectorToBullet(forceAmount*camera.getLookDir()));
-	physicsWorld->addObject(bullet);
+	((btRigidBody*)bullet->getCollisionObject())->applyCentralForce(Utils::convertGLMVectorToBullet(forceAmount*camera.getLookDir()));
+	physicsWorld->addRigidObject(bullet);
 }
 void resize(int w, int h)
 {

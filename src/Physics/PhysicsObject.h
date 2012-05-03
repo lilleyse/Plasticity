@@ -7,42 +7,23 @@
 #include <bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 #include <glm/glm.hpp>
 
-#include "../Mesh.h"
 #include "PhysicsUtils.h"
+#include "../Mesh.h"
 #include "../Utils.h"
-
-/*--------------------------------------
-PhysicsObject has physics properties for
-integration with Bullet.
---------------------------------------*/
-
-enum PRIMITIVE_TYPE {
-	PRIMITIVE_BOX,       //box
-	PRIMITIVE_SPHERE,    //sphere
-	PRIMITIVE_CYLINDER,  //cylinder
-	PRIMITIVE_CONE,      //cone
-	PRIMITIVE_CAPSULE,   //capsule
-	PRIMITIVE_MESH,      //mesh
-};
 
 class PhysicsObject
 {
 public:
-
 	//Constructors
-	PhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh, float mass, float restitution, float friction);
+	PhysicsObject();
 	~PhysicsObject();
 
-	//Rigidbody
-	btRigidBody* getRigidBody();
+	//Collision object
+	btCollisionObject* getCollisionObject();
 
 	//Mesh
 	Mesh* getAttachedMesh();
 
-	//Mass
-	void setMass(float mass);
-	float getMass();
-	
 	//Restitution
 	void setRestitution(float restitution);
 	float getRestitution();
@@ -82,13 +63,10 @@ public:
     void rotate(glm::vec3 axis, float angle);
     void setRotation(glm::vec3 axis, float angle);
 
-private:
-
-	void createRigidBody(float mass, float friction, float restitution);
-
+protected:
 	Mesh* attachedMesh;
 	btCollisionShape* collisionShape;
-	btRigidBody* rigidBody;
+	btCollisionObject* collisionObject;
 	glm::mat4 transformationMatrix;
 };
 

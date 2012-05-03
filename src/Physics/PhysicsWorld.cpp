@@ -2,6 +2,7 @@
 
 PhysicsWorld::PhysicsWorld()
 {
+	/* REGULAR DYNAMICS WORLD
 	//Set up bullet objects
 	this->collisionConfiguration = new btDefaultCollisionConfiguration();
 	this->dispatcher = new btCollisionDispatcher(this->collisionConfiguration);
@@ -13,17 +14,33 @@ PhysicsWorld::PhysicsWorld()
 	this->dynamicsWorld->getSolverInfo().m_splitImpulse = true;
 	this->dynamicsWorld->getSolverInfo().m_numIterations = 20;
 	this->dynamicsWorld->getDispatchInfo().m_useContinuous = true;
-	this->dynamicsWorld->setGravity(btVector3(0,-10,0));
+	this->dynamicsWorld->setGravity(btVector3(0,-10,0));*/
+
+	//SOFT BODY WORLD
+	this->collisionConfiguration = new btSoftBodyRigidBodyCollisionConfiguration();
+	this->dispatcher = new btCollisionDispatcher(this->collisionConfiguration);
+	btVector3 worldAabbMin(-1000,-1000,-1000);
+	btVector3 worldAabbMax(1000,1000,1000);
+	int maxProxies = 32766;
+	this->broadphase = new btAxisSweep3(worldAabbMin,worldAabbMax,maxProxies);
+	this->solver = new btSequentialImpulseConstraintSolver();
+	this->world = new btSoftRigidDynamicsWorld(this->dispatcher,this->broadphase,this->solver,this->collisionConfiguration);
+	//this->world->getSolverInfo().m_splitImpulse = true;
+	//this->world->getSolverInfo().m_numIterations = 20;
+	//this->world->getDispatchInfo().m_useContinuous = true;
+	this->world->setGravity(btVector3(0,-10,0));
+
 }
 PhysicsWorld::~PhysicsWorld(){}
 
 void PhysicsWorld::update()
 {
-	this->dynamicsWorld->stepSimulation(1.0f/60.0f);
-	this->processCollisions();
+	this->world->stepSimulation(1.0f/60.0f);
+	//this->processCollisions();
 }
 void PhysicsWorld::processCollisions()
 {
+	/*
 	int numManifolds = this->dynamicsWorld->getDispatcher()->getNumManifolds();
 	for (int i=0;i<numManifolds;i++)
 	{
@@ -45,15 +62,20 @@ void PhysicsWorld::processCollisions()
 			this->processCollision(obA,pt,indexA,ptA,normalOnA);
 			this->processCollision(obB,pt,indexB,ptB,normalOnB);
 		}
-	}
+	}*/
 }
+
+float threshhold = .1f;
+float maxMagnitude = .2f;
+
 void PhysicsWorld::processCollision(btRigidBody* ob, btManifoldPoint& pt, int triIndex, btVector3& pos, btVector3& normal)
 {
+	/*
 	if(ob->getCollisionShape()->isConcave())
 	{
 		float impulse = pt.m_appliedImpulse;
 		float distance = pt.getDistance();
-		if (distance < 0.f && impulse > 5.0f)
+		if (distance < 0.f && impulse > threshhold)
 		{
 			glm::vec3 intersectionPos = Utils::convertBulletVectorToGLM(pos);
 
@@ -83,8 +105,10 @@ void PhysicsWorld::processCollision(btRigidBody* ob, btManifoldPoint& pt, int tr
 			}
 
 			//Update the positions for all neighbors around the intersection point
-			float range = 1.5f;
+			float range = 6.0f;
 			float magnitude = -impulse*.05f;
+			if(magnitude < -maxMagnitude) magnitude = -maxMagnitude;
+
 			std::vector<int> neighbors = renderMesh->getBaseMesh()->getNeighbors(bestIndex);
 			neighbors.push_back(bestIndex);
 
@@ -121,12 +145,16 @@ void PhysicsWorld::processCollision(btRigidBody* ob, btManifoldPoint& pt, int tr
 			//trimeshe->partialRefitTree(aabbMin,aabbMax);
 			//this->dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(obA->getBroadphaseHandle(),this->dynamicsWorld->getDispatcher());
 		}
-	}
+	}*/
 }
-void PhysicsWorld::addObject(PhysicsObject* object)
+void PhysicsWorld::addRigidObject(RigidPhysicsObject* object)
 {
-	this->dynamicsWorld->addRigidBody(object->getRigidBody());
+	this->world->addRigidBody((btRigidBody*)object->getCollisionObject());
 	this->objects.push_back(object);
+}
+void PhysicsWorld::addSoftObject(SoftPhysicsObject* object)
+{
+	this->world->addSoftBody((btSoftBody*)object->getCollisionObject());
 }
 std::vector<PhysicsObject*>& PhysicsWorld::getObjects()
 {
