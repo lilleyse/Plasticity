@@ -179,30 +179,34 @@ void initPhysics()
 
 	//ground plane
 	RigidPhysicsObject* floor = new RigidPhysicsObject(
-		PRIMITIVE_MESH,
-		Globals::meshLibrary.getMesh(5),
+		PRIMITIVE_BOX,
+		Globals::meshLibrary.getMesh(1),
 		0.0f,0.9f,0.8f);
-	floor->translateY(-3.0f);
+	floor->translateY(-6.0f);
+	floor->setScale(glm::vec3(10,1,10));
 	physicsWorld->addRigidObject(floor);
 
 	//Bullet
-	RigidPhysicsObject* bullet = new RigidPhysicsObject(
-		PRIMITIVE_MESH,
+	SoftPhysicsObject* ball = new SoftPhysicsObject(
 		Globals::meshLibrary.getMesh(3),
-		1.0f,0.9f,0.7f);
-	bullet->setTranslation(glm::vec3(0,10,0));
-	physicsWorld->addRigidObject(bullet);
+		10.0f,0.9f,0.7f);
+	physicsWorld->addSoftObject(ball);
 }
 void shootBall()
 {
-	RigidPhysicsObject* bullet = new RigidPhysicsObject(
+	SoftPhysicsObject* ball = new SoftPhysicsObject(
+		Globals::meshLibrary.getMesh(3),
+		10.0f,0.9f,0.7f);
+	physicsWorld->addSoftObject(ball);
+	
+	/*RigidPhysicsObject* bullet = new RigidPhysicsObject(
 		PRIMITIVE_SPHERE,
 		Globals::meshLibrary.getMesh(3),
 		1.0f,0.9f,0.7f);
 	float forceAmount = 1000.0f;
 	bullet->setTranslation(camera.getCameraPos());
 	((btRigidBody*)bullet->getCollisionObject())->applyCentralForce(Utils::convertGLMVectorToBullet(forceAmount*camera.getLookDir()));
-	physicsWorld->addRigidObject(bullet);
+	physicsWorld->addRigidObject(bullet);*/
 }
 void resize(int w, int h)
 {
@@ -252,6 +256,8 @@ void enterFrame()
 		*modelViewPointer = modelViewStruct;
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
 
+		//update and render
+		object->update();
 		object->getAttachedMesh()->render();
 	}
 }

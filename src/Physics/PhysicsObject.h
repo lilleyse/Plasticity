@@ -18,6 +18,9 @@ public:
 	PhysicsObject();
 	~PhysicsObject();
 
+	//Update
+	virtual void update();
+
 	//Collision object
 	btCollisionObject* getCollisionObject();
 

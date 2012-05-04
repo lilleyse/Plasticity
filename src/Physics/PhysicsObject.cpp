@@ -1,8 +1,10 @@
 #include "PhysicsObject.h"
 
-
 PhysicsObject::PhysicsObject(){}
 PhysicsObject::~PhysicsObject(){}
+
+//Update
+void PhysicsObject::update(){}
 
 //Collision Object
 btCollisionObject* PhysicsObject::getCollisionObject()

@@ -2,16 +2,12 @@
 
 Mesh::Mesh(BaseMesh* baseMesh)
 {
-
 	numVertices = baseMesh->vertices.size();
 	numElements = baseMesh->elementArray.size();
 
 	this->baseMesh = baseMesh;
 	vertices = new Vertex[numVertices];
 	memcpy(vertices, &baseMesh->vertices[0], sizeof(Vertex)*numVertices);
-	//create opengl mesh based on the positions
-	
-	
 
 	//create and bind array buffer, set data
     glGenBuffers(1, &arrayBufferObject);
@@ -50,13 +46,9 @@ Mesh::Mesh(BaseMesh* baseMesh)
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
 }
 
-Mesh::~Mesh()
-{
-
-}
+Mesh::~Mesh(){}
 
 Vertex* Mesh::getVertices()
 {

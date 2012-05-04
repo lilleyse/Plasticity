@@ -2,27 +2,49 @@
 
 SoftPhysicsObject::SoftPhysicsObject(BaseMesh* baseMesh, float mass, float restitution, float friction)
 {
+	this->attachedMesh = new Mesh(baseMesh);
 	int numTriangles = baseMesh->elementArray.size()/3;
-	int vertexStride = sizeof(Vertex);
-	int indexStride = 3*sizeof(int);
 	int numVertices = baseMesh->vertices.size();
+	Vertex* vertexData = this->attachedMesh->getVertices();
 
-	this->collisionObject = btSoftBodyHelpers::CreateFromTriMesh(pdemo->m_softBodyWorldInfo,gVerticesBunny,
-		&gIndicesBunny[0][0],
-		BUNNY_NUM_TRIANGLES);
-	btSoftBody::Material*	pm=psb->appendMaterial();
-	pm->m_kLST				=	0.5;
-	pm->m_flags				-=	btSoftBody::fMaterial::DebugDraw;
-	psb->generateBendingConstraints(2,pm);
-	psb->m_cfg.piterations	=	2;
-	psb->m_cfg.kDF			=	0.5;
-	psb->randomizeConstraints();
-	psb->scale(btVector3(6,6,6));
-	psb->setTotalMass(100,true);	
-	pdemo->getSoftDynamicsWorld()->addSoftBody(psb);
-	pdemo->m_cutting=true;
+	float *vertices = new float[numVertices*3];
+	for(int i = 0; i < numVertices; i++)
+	{
+		Vertex* currentVertex = vertexData + i;
+		vertices[i*3 + 0] = currentVertex->x;
+		vertices[i*3 + 1] = currentVertex->y;
+		vertices[i*3 + 2] = currentVertex->z;
+	}
+
+	btSoftBodyWorldInfo nullWorldInfo;
+	this->collisionObject = btSoftBodyHelpers::CreateFromTriMesh(
+		nullWorldInfo,vertices,this->attachedMesh->getElements(),numTriangles);
+	btSoftBody* softBody = ((btSoftBody*)this->collisionObject);
+	btSoftBody::Material* material = softBody->appendMaterial();
+	softBody->generateBendingConstraints(2,material); //2 -- 10
+	softBody->m_cfg.piterations	= 5; //2 -- 20
+	softBody->m_cfg.kDF	= friction;
+	softBody->m_cfg.collisions	|=	btSoftBody::fCollision::VF_SS;
+	softBody->randomizeConstraints();
+	softBody->setTotalMass(mass,true);
 }
-SoftPhysicsObject::~SoftPhysicsObject()
-{
+SoftPhysicsObject::~SoftPhysicsObject(){}
 
+//Update
+void SoftPhysicsObject::update()
+{
+	Vertex* vertexData = this->attachedMesh->getVertices();
+	btSoftBody* softBody = ((btSoftBody*)this->collisionObject);
+	for(int i = 0; i < softBody->m_nodes.size(); i++)
+	{
+		const btSoftBody::Node& node = softBody->m_nodes[i];
+		Vertex* currentVertex = vertexData + i;
+		currentVertex->x = node.m_x[0];
+		currentVertex->y = node.m_x[1];
+		currentVertex->z = node.m_x[2];
+		currentVertex->nx = node.m_n[0];
+		currentVertex->ny = node.m_n[1];
+		currentVertex->nz = node.m_n[2];
+	}
+	this->attachedMesh->updateVertices();
 }

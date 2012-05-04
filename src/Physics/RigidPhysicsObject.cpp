@@ -46,7 +46,7 @@ RigidPhysicsObject::RigidPhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh,
 	}
 	this->createRigidBody(mass,friction,restitution);
 }
-PhysicsObject::~PhysicsObject(){}
+RigidPhysicsObject::~RigidPhysicsObject(){}
 
 //RigidBody
 void RigidPhysicsObject::createRigidBody(float mass, float friction, float restitution)
@@ -59,10 +59,10 @@ void RigidPhysicsObject::createRigidBody(float mass, float friction, float resti
 	//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(btTransform::getIdentity());
 	btRigidBody::btRigidBodyConstructionInfo cInfo(mass,myMotionState,this->collisionShape,localInertia);
-	this->rigidBody = new btRigidBody(cInfo);
-	this->rigidBody->setContactProcessingThreshold(BT_LARGE_FLOAT);
-	this->rigidBody->setFriction(friction);
-	this->rigidBody->setRestitution(restitution);
-	this->rigidBody->setCcdMotionThreshold(.1f);
-	this->rigidBody->setCcdSweptSphereRadius(.1f);
+	this->collisionObject = new btRigidBody(cInfo);
+	this->collisionObject->setContactProcessingThreshold(BT_LARGE_FLOAT);
+	this->collisionObject->setFriction(friction);
+	this->collisionObject->setRestitution(restitution);
+	this->collisionObject->setCcdMotionThreshold(.1f);
+	this->collisionObject->setCcdSweptSphereRadius(.1f);
 }

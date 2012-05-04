@@ -14,5 +14,8 @@ public:
 	//Constructors
 	SoftPhysicsObject(BaseMesh* baseMesh, float mass, float restitution, float friction);
 	~SoftPhysicsObject();
+
+	//Update
+	virtual void update();
 };
 

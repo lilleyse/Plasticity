@@ -38,7 +38,7 @@ void BaseMesh::initializeNeighbors()
 		if(currentIndex > largestIndex)
 			largestIndex = currentIndex;
 	}
-	for(unsigned int i = 0; i < largestIndex; i++)
+	for(int i = 0; i < largestIndex; i++)
 	{
 		int currentIndex = i;
 		for(unsigned int j = 0; j < elementArrayForBullet.size(); j+=3)
