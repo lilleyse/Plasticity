@@ -66,3 +66,8 @@ void RigidPhysicsObject::createRigidBody(float mass, float friction, float resti
 	this->collisionObject->setCcdMotionThreshold(.1f);
 	this->collisionObject->setCcdSweptSphereRadius(.1f);
 }
+
+void RigidPhysicsObject::update()
+{
+	attachedMesh->updateNormals();
+}

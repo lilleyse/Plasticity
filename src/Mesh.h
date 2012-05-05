@@ -11,6 +11,13 @@ enum Attributes
 };
 
 
+
+struct NormalHelper
+{
+	glm::vec3 normal;
+	void updateNormal(glm::vec3& orig, glm::vec3& p1, glm::vec3& p2);
+};
+
 class Mesh
 {
 public:
@@ -24,11 +31,10 @@ public:
 	BaseMesh* getBaseMesh();
 
 	void updateVertices(); //updates the vbo
-	void updateNormal(int index);
-	void updateNeighborNormals(int index);
+	void updateNormals();
 
 private:
-
+	
 	int numElements;
 	int numVertices;
 	GLuint vertexArrayObject;
@@ -37,4 +43,6 @@ private:
 
 	BaseMesh* baseMesh;
 	Vertex* vertices;
+	
+	NormalHelper* normalHelperArray;
 };

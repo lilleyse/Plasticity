@@ -29,9 +29,11 @@ BaseMesh::BaseMesh(std::vector<float>& positionData, std::vector<float>& normals
 		this->initializeNeighbors();
 }
 
+
+
 void BaseMesh::initializeNeighbors()
 {
-	int largestIndex = 0;
+	/*int largestIndex = 0;
 	for (unsigned int i = 0; i < elementArrayForBullet.size(); i++)
 	{
 		int currentIndex = elementArrayForBullet.at(i);
@@ -65,7 +67,7 @@ void BaseMesh::initializeNeighbors()
 				}
 			}
 		}
-	}
+	}*/
 }
 
 std::vector<int>& BaseMesh::getNeighbors(int index)
