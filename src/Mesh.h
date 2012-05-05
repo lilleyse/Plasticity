@@ -33,10 +33,10 @@ public:
 	void updateVertices(); //updates the vbo
 	void updateNormals();
 
-private:
-	
 	int numElements;
 	int numVertices;
+
+private:
 	GLuint vertexArrayObject;
 	GLuint arrayBufferObject;
 	GLuint elementBufferObject;

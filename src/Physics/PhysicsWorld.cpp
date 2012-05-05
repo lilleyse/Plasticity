@@ -14,7 +14,7 @@ PhysicsWorld::~PhysicsWorld(){}
 void PhysicsWorld::update()
 {
 	this->world->stepSimulation(1.0f/60.0f);
-	//this->processCollisions();
+	this->processCollisions();
 }
 void PhysicsWorld::processCollisions()
 {
@@ -42,13 +42,10 @@ void PhysicsWorld::processCollisions()
 	}
 }
 
-
-
 void PhysicsWorld::processCollision(btRigidBody* ob, btManifoldPoint& pt, int triIndex, btVector3& pos, btVector3& normal)
 {
-	/*
-	float threshhold = .1f;
-	float maxMagnitude = .2f;
+	float threshhold = .3f;
+	float maxMagnitude = 2.0f;
 	if(ob->getCollisionShape()->isConcave())
 	{
 		float impulse = pt.m_appliedImpulse;
@@ -56,74 +53,34 @@ void PhysicsWorld::processCollision(btRigidBody* ob, btManifoldPoint& pt, int tr
 		if (distance < 0.f && impulse > threshhold)
 		{
 			glm::vec3 intersectionPos = Utils::convertBulletVectorToGLM(pos);
-
-			std::cout << "Impulse: " << impulse << std::endl;			
-			std::cout << "normal: ";
-			Utils::printVec3(Utils::convertBulletVectorToGLM(normal));
-
 			btCollisionShape* trimesh = ob->getCollisionShape();
-			Mesh* renderMesh = (Mesh*)trimesh->getUserPointer();
-			Vertex* vertices = renderMesh->getVertices();
-			int* elements = renderMesh->getElements();
-
-			//Find the closest index in the intersection triangle
-			int bestIndex;
-			float bestDistance = 10000;
-			for(int k = 0; k < 3; k++)
-			{
-				int index = elements[triIndex*3+k];
-				Vertex& vertexInTriangle = vertices[index];
-				glm::vec3 vertexPos = glm::vec3(vertexInTriangle.x, vertexInTriangle.y, vertexInTriangle.z);
-				float distanceFromIntersectionPoint = glm::distance(intersectionPos, vertexPos);
-				if(distanceFromIntersectionPoint < bestDistance)
-				{
-					bestDistance = distanceFromIntersectionPoint;
-					bestIndex = index;
-				}
-			}
+			Mesh* mesh = (Mesh*)trimesh->getUserPointer();
+			Vertex* vertices = mesh->getVertices();
+			int numVertices = mesh->numVertices;
 
 			//Update the positions for all neighbors around the intersection point
-			float range = 6.0f;
-			float magnitude = -impulse*.05f;
+			float range = 5.0f;
+			float magnitude = -impulse*.5f;
 			if(magnitude < -maxMagnitude) magnitude = -maxMagnitude;
 
-			std::vector<int> neighbors = renderMesh->getBaseMesh()->getNeighbors(bestIndex);
-			neighbors.push_back(bestIndex);
-
-			for(unsigned int k = 0; k < neighbors.size(); k+=2)
+			for(int i = 0; i < numVertices; i++)
 			{
-				int neighborIndex = neighbors[k];
-				Vertex& neighbor = vertices[neighborIndex];
-				glm::vec3 neighborPos = glm::vec3(neighbor.x,neighbor.y,neighbor.z);
-				float distanceFromIntersectionPoint = glm::distance(intersectionPos, neighborPos);
-				float clampedDistance = glm::clamp((range - distanceFromIntersectionPoint)/range, 0.0f, 1.0f);
-				neighbor.x += normal.getX()*magnitude*clampedDistance;
-				neighbor.y += normal.getY()*magnitude*clampedDistance;
-				neighbor.z += normal.getZ()*magnitude*clampedDistance;
+				glm::vec3 vertex = glm::vec3(vertices[i].x, vertices[i].y, vertices[i].z);
+				float distanceFromIntersection = glm::distance(intersectionPos,vertex);
+				float clampedDistance = glm::clamp((range - distanceFromIntersection)/range, 0.0f, 1.0f);
+				vertices[i].x += normal.getX()*magnitude*clampedDistance;
+				vertices[i].y += normal.getY()*magnitude*clampedDistance;
+				vertices[i].z += normal.getZ()*magnitude*clampedDistance;
 			}
 
-			for(unsigned int k = 0; k < neighbors.size(); k+=2)
-			{
-				int neighborIndex = neighbors[k];
-				renderMesh->updateNormal(neighborIndex);
-				renderMesh->updateNeighborNormals(neighborIndex);
-			}
-
-			//obB->setDamping(100.0,100.0);
-			//obB->applyDamping(1/60.0);
-			//btVector3 oppositeForce = btVector3(1000,1000,1000);
-			//btTransform bulletTransform = obB->getWorldTransform();
-			//btVector3 position = btVector3(0,0,0);
-			//bulletTransform.setOrigin(position);
-			//obB->setWorldTransform(bulletTransform);
-
-			renderMesh->updateVertices();
+			mesh->updateNormals();
+			mesh->updateVertices();
 			//Clean the intersections
 			//trimesh->postUpdate();
 			//trimeshe->partialRefitTree(aabbMin,aabbMax);
 			//this->dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(obA->getBroadphaseHandle(),this->dynamicsWorld->getDispatcher());
 		}
-	}*/
+	}
 }
 void PhysicsWorld::addRigidObject(RigidPhysicsObject* object)
 {

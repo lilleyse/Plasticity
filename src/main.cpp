@@ -179,18 +179,18 @@ void initPhysics()
 
 	//ground plane
 	RigidPhysicsObject* floor = new RigidPhysicsObject(
-		PRIMITIVE_BOX,
-		Globals::meshLibrary.getMesh(1),
+		PRIMITIVE_MESH,
+		Globals::meshLibrary.getMesh(5),
 		0.0f,0.9f,0.8f);
-	floor->translateY(-10.0f);
-	floor->setScale(glm::vec3(10,1,10));
+	//floor->translateY(-10.0f);
+	floor->setScale(glm::vec3(1,1,1));
 	physicsWorld->addRigidObject(floor);
 
 	//Bullet
-	SoftPhysicsObject* ball = new SoftPhysicsObject(
-		Globals::meshLibrary.getMesh(6), 4, 10,
-		10.0f,0.9f,0.7f);
-	physicsWorld->addSoftObject(ball);
+	//SoftPhysicsObject* ball = new SoftPhysicsObject(
+	//	Globals::meshLibrary.getMesh(6), 4, 10,
+	//	10.0f,0.9f,0.7f);
+	//physicsWorld->addSoftObject(ball);
 }
 void shootBall()
 {
