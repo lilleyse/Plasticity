@@ -18,11 +18,10 @@ void PhysicsWorld::update()
 }
 void PhysicsWorld::processCollisions()
 {
-	/*
-	int numManifolds = this->dynamicsWorld->getDispatcher()->getNumManifolds();
+	int numManifolds = this->world->getDispatcher()->getNumManifolds();
 	for (int i=0;i<numManifolds;i++)
 	{
-		btPersistentManifold* contactManifold =  this->dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+		btPersistentManifold* contactManifold =  this->world->getDispatcher()->getManifoldByIndexInternal(i);
 		btRigidBody* obA = static_cast<btRigidBody*>(contactManifold->getBody0());
 		btRigidBody* obB = static_cast<btRigidBody*>(contactManifold->getBody1());
 
@@ -40,7 +39,7 @@ void PhysicsWorld::processCollisions()
 			this->processCollision(obA,pt,indexA,ptA,normalOnA);
 			this->processCollision(obB,pt,indexB,ptB,normalOnB);
 		}
-	}*/
+	}
 }
 
 
@@ -130,6 +129,7 @@ void PhysicsWorld::addRigidObject(RigidPhysicsObject* object)
 {
 	this->world->addRigidBody((btRigidBody*)object->getCollisionObject());
 	this->objects.push_back(object);
+	this->rigidObjects.push_back(object);
 }
 void PhysicsWorld::addSoftObject(SoftPhysicsObject* object)
 {
@@ -137,9 +137,6 @@ void PhysicsWorld::addSoftObject(SoftPhysicsObject* object)
 	softBody->m_worldInfo = &(world->getWorldInfo());
 	this->world->addSoftBody(softBody);
 	this->objects.push_back(object);
-}
-std::vector<PhysicsObject*>& PhysicsWorld::getObjects()
-{
-	return this->objects;
+	this->softObjects.push_back(object);
 }
 

@@ -25,14 +25,17 @@ public:
 	void update();
 	void processCollisions();
 	void processCollision(btRigidBody* ob, btManifoldPoint& pt, int triIndex, btVector3& pos, btVector3& normal);
-	std::vector<PhysicsObject*>& getObjects();
 
 	btDefaultCollisionConfiguration* collisionConfiguration;
 	btSoftRigidDynamicsWorld* world;
 	btBroadphaseInterface*	broadphase;
 	btCollisionDispatcher*	dispatcher;
 	btConstraintSolver*	solver;
+	
+	std::vector<PhysicsObject*> objects;
+	std::vector<SoftPhysicsObject*> softObjects;
+	std::vector<RigidPhysicsObject*> rigidObjects;
 
 private:
-	std::vector<PhysicsObject*> objects;
+	
 };

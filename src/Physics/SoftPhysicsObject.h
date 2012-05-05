@@ -12,10 +12,19 @@ class SoftPhysicsObject : public PhysicsObject
 public:
 
 	//Constructors
-	SoftPhysicsObject(BaseMesh* baseMesh, float mass, float restitution, float friction);
+	SoftPhysicsObject(BaseMesh* baseMesh, int bendingConstraints, int iterations, float mass, float restitution, float friction);
 	~SoftPhysicsObject();
 
 	//Update
 	virtual void update();
+
+	//Hardness
+	void toggleHardness(bool hardness);
+
+private:
+	btSoftBody::tLinkArray softLinkArray;
+	btSoftBody::tLinkArray hardLinkArray;
+	int pIterationsSoft;
+	int pIterationsHard;
 };
 
