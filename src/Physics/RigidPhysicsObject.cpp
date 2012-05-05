@@ -29,7 +29,7 @@ RigidPhysicsObject::RigidPhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh,
 
 		if(mass == 0)
 		{
-			float dim = 100;
+			float dim = 100000;
 			btVector3 aabbMin(-dim,-dim,-dim);
 			btVector3 aabbMax(dim,dim,dim);
 			btBvhTriangleMeshShape* trimesh = new btBvhTriangleMeshShape(indexVertexArrays,true,aabbMin,aabbMax);

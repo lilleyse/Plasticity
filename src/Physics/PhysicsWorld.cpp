@@ -39,6 +39,19 @@ void PhysicsWorld::processCollisions()
 			this->processCollision(obA,pt,indexA,ptA,normalOnA);
 			this->processCollision(obB,pt,indexB,ptB,normalOnB);
 		}
+
+		if(obB->getCollisionShape()->isConcave())
+		{
+			btBvhTriangleMeshShape* trimesh = (btBvhTriangleMeshShape*)(obB->getCollisionShape());
+			//trimesh->postUpdate();
+			float dim = 100000;
+			btVector3 aabbMin(-dim,-dim,-dim);
+			btVector3 aabbMax(dim,dim,dim);
+			trimesh->refitTree(aabbMin,aabbMax);
+			//this->world->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(obA->getBroadphaseHandle(),this->world->getDispatcher());
+			//this->world->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(obB->getBroadphaseHandle(),this->world->getDispatcher());
+		}
+		
 	}
 }
 
@@ -62,7 +75,6 @@ void PhysicsWorld::processCollision(btRigidBody* ob, btManifoldPoint& pt, int tr
 			float range = 5.0f;
 			float magnitude = -impulse*.5f;
 			if(magnitude < -maxMagnitude) magnitude = -maxMagnitude;
-
 			for(int i = 0; i < numVertices; i++)
 			{
 				glm::vec3 vertex = glm::vec3(vertices[i].x, vertices[i].y, vertices[i].z);
@@ -75,10 +87,11 @@ void PhysicsWorld::processCollision(btRigidBody* ob, btManifoldPoint& pt, int tr
 
 			mesh->updateNormals();
 			mesh->updateVertices();
+
 			//Clean the intersections
 			//trimesh->postUpdate();
 			//trimeshe->partialRefitTree(aabbMin,aabbMax);
-			//this->dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(obA->getBroadphaseHandle(),this->dynamicsWorld->getDispatcher());
+			//this->world->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(ob->getBroadphaseHandle(),this->world->getDispatcher());
 		}
 	}
 }
