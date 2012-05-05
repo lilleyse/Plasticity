@@ -31,8 +31,8 @@ void PhysicsWorld::processCollisions()
 			btManifoldPoint& pt = contactManifold->getContactPoint(j);
 			int indexA = pt.m_index0;
 			int indexB = pt.m_index1;
-			btVector3 ptA = pt.getPositionWorldOnA();
-			btVector3 ptB = pt.getPositionWorldOnB();
+			btVector3 ptA = pt.m_localPointA;//pt.getPositionWorldOnA();
+			btVector3 ptB = pt.m_localPointB;//pt.getPositionWorldOnB();
 			btVector3 normalOnB = pt.m_normalWorldOnB;
 			btVector3 normalOnA = -pt.m_normalWorldOnB;
 			float impulse = pt.m_appliedImpulse;

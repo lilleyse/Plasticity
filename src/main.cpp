@@ -182,7 +182,8 @@ void initPhysics()
 		PRIMITIVE_MESH,
 		Globals::meshLibrary.getMesh(5),
 		0.0f,0.9f,0.8f);
-	//floor->translateY(-10.0f);
+	floor->translateY(-10.0f);
+	floor->rotate(glm::vec3(1,0,0),0);
 	floor->setScale(glm::vec3(1,1,1));
 	physicsWorld->addRigidObject(floor);
 
