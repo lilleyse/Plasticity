@@ -69,5 +69,5 @@ void RigidPhysicsObject::createRigidBody(float mass, float friction, float resti
 
 void RigidPhysicsObject::update()
 {
-	attachedMesh->updateNormals();
+	//attachedMesh->updateNormals();
 }

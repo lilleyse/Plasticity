@@ -287,7 +287,6 @@ int main (int argc, char **argv)
 
 	bool wireframe = false;
 
-	bool mouseDown = false;
 	int prevMouseX = 0;
 	int prevMouseY = 0;
 
@@ -329,6 +328,13 @@ int main (int argc, char **argv)
 		}
 
 
+		if(window->GetInput().IsMouseButtonDown(sf::Mouse::Left))
+		{
+			prevMouseX = window->GetInput().GetMouseX();
+			prevMouseY = window->GetInput().GetMouseY();
+		}
+
+
         sf::Event myEvent;
         while (window->GetEvent(myEvent))
         {
@@ -337,33 +343,16 @@ int main (int argc, char **argv)
 				case sf::Event::Resized:
 
 					resize(window->GetWidth(), window->GetHeight());
-					break;
+					break;					
 
 				case sf::Event::MouseButtonPressed:
-
-					if(myEvent.MouseButton.Button == sf::Mouse::Left)
-					{
-						mouseDown = true;
-						prevMouseX = myEvent.MouseButton.X;
-						prevMouseY = myEvent.MouseButton.Y;
-					}
-					else if(myEvent.MouseButton.Button == sf::Mouse::Right)
+					if(window->GetInput().IsMouseButtonDown(sf::Mouse::Right))
 					{
 						shootBall();
 					}
 					break;
-
-				case sf::Event::MouseButtonReleased:
-
-					if(myEvent.MouseButton.Button == sf::Mouse::Left)
-					{
-						mouseDown = false;
-					}
-					break;
-
 				case sf::Event::MouseMoved:
 
-					if(mouseDown)
 					{
 						int x = myEvent.MouseMove.X;
 						int y = myEvent.MouseMove.Y;
@@ -374,11 +363,27 @@ int main (int argc, char **argv)
 						float scaleFactor = .008f;
 						float mouseXDifference = -mouseXDiff * scaleFactor;
 						float mouseYDifference = -mouseYDiff * scaleFactor;
-						camera.rotate(mouseXDifference,mouseYDifference);
 
 						prevMouseX = x;
 						prevMouseY = y;
+
+
+						if(window->GetInput().IsMouseButtonDown(sf::Mouse::Left))
+						{	
+							float scaleFactor = .008f;
+							float mouseXDifference = -(float)mouseXDiff * scaleFactor;
+							float mouseYDifference = -(float)mouseYDiff * scaleFactor;
+							camera.rotate(mouseXDifference,mouseYDifference);
+						}
+						else if(window->GetInput().IsMouseButtonDown(sf::Mouse::Middle))
+						{
+							float scaleFactor = .05f;
+							float mouseXDifference = -(float)mouseXDiff * scaleFactor;
+							float mouseYDifference = (float)mouseYDiff * scaleFactor;
+							camera.pan(mouseXDifference,mouseYDifference);
+						}
 					}
+
 					break;
 
 				case sf::Event::MouseWheelMoved:

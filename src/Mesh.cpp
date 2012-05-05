@@ -108,6 +108,7 @@ void Mesh::updateNormals()
 	for(int i = 0; i < numVertices; i++)
 	{
 		glm::vec3 normal = glm::normalize(normalHelperArray[i].normal);
+		normalHelperArray[i].normal = glm::vec3(0,0,0);
 		vertices[i].nx = normal.x;
 		vertices[i].ny = normal.y;
 		vertices[i].nz = normal.z;
