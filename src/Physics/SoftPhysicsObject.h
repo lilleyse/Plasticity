@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-
 #include <glm/glm.hpp>
 #include <bullet/BulletSoftBody/btSoftBodyHelpers.h>
 
@@ -17,14 +16,5 @@ public:
 
 	//Update
 	virtual void update();
-
-	//Hardness
-	void toggleHardness(bool hardness);
-
-private:
-	btSoftBody::tLinkArray softLinkArray;
-	btSoftBody::tLinkArray hardLinkArray;
-	int pIterationsSoft;
-	int pIterationsHard;
 };
 

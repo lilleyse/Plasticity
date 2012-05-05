@@ -21,21 +21,8 @@ SoftPhysicsObject::SoftPhysicsObject(BaseMesh* baseMesh, int bendingConstraints,
 		nullWorldInfo,vertices,this->attachedMesh->getElements(),numTriangles);
 	btSoftBody* softBody = ((btSoftBody*)this->collisionObject);
 	btSoftBody::Material* material = softBody->appendMaterial();
-
-	//Establish hard and soft links
-	btSoftBody::tLinkArray originalLinks = softBody->m_links;
 	softBody->generateBendingConstraints(bendingConstraints,material); //2 -- 10
-	softLinkArray = softBody->m_links;
-
-	softBody->m_links = originalLinks;
-	softBody->generateBendingConstraints(10,material);
-	hardLinkArray = softBody->m_links;
-
-	this->pIterationsSoft = iterations;
-	this->pIterationsHard = 20;
-
-	this->toggleHardness(false);
-	
+	softBody->m_cfg.piterations = iterations; //2 -- 20
 	softBody->m_cfg.kDF	= friction;
 	softBody->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
 	softBody->randomizeConstraints();
@@ -60,29 +47,4 @@ void SoftPhysicsObject::update()
 		currentVertex->nz = node.m_n[2];
 	}
 	this->attachedMesh->updateVertices();
-}
-
-//Hardness
-void SoftPhysicsObject::toggleHardness(bool hardness)
-{
-	btSoftBody* softBody = ((btSoftBody*)this->collisionObject);
-	btSoftBody::Material* material = softBody->appendMaterial();
-
-	if(hardness)
-	{
-		softBody->m_links = hardLinkArray;
-		softBody->m_cfg.piterations	= pIterationsHard; //2 -- 20
-	}
-	else
-	{
-		softBody->m_links = softLinkArray;
-		softBody->m_cfg.piterations = pIterationsSoft;
-	}
-	//softBody->m_cfg.kCHR = 1.0;
-	//softBody->m_cfg.kKHR = 1.0;
-	//softBody->m_cfg.kSRHR_CL = 1.0;
-	//softBody->m_cfg.kSKHR_CL = 1.0;
-	//softBody->m_cfg.kSSHR_CL = 1.0;
-	//softBody->m_cfg.kVC = 0.5;
-	//softBody->m_cfg.kPR = 100.0;
 }

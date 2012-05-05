@@ -186,17 +186,11 @@ void initPhysics()
 	floor->setScale(glm::vec3(10,1,10));
 	physicsWorld->addRigidObject(floor);
 
-	sf::Clock clock;
-	clock.Reset();
 	//Bullet
 	SoftPhysicsObject* ball = new SoftPhysicsObject(
 		Globals::meshLibrary.getMesh(6), 4, 10,
 		10.0f,0.9f,0.7f);
 	physicsWorld->addSoftObject(ball);
-
-	float time = clock.GetElapsedTime();
-	std::cout << time << std::endl;
-
 }
 void shootBall()
 {
@@ -270,15 +264,6 @@ void drawWireframe(bool enable)
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
-void toggleSoftBodyHardness(bool hardness)
-{
-	std::vector<SoftPhysicsObject*>& softObjects = physicsWorld->softObjects;
-	for(unsigned int i = 0; i < softObjects.size(); i++)
-	{
-		SoftPhysicsObject* softObject = softObjects.at(i);
-		softObject->toggleHardness(hardness);
-	}
-}
 
 /*-----------------------------
 		Input/Output 
@@ -301,7 +286,6 @@ int main (int argc, char **argv)
 	resize(width, height);
 
 	bool wireframe = false;
-	bool hardness = false;
 
 	bool mouseDown = false;
 	int prevMouseX = 0;
@@ -413,11 +397,6 @@ int main (int argc, char **argv)
 					{
 						wireframe = !wireframe;
 						drawWireframe(wireframe);
-					}
-					else if(myEvent.Key.Code == sf::Key::A)
-					{
-						hardness = !hardness;
-						toggleSoftBodyHardness(hardness);
 					}
 					break;
 
