@@ -52,6 +52,7 @@ public:
     void setTranslation(glm::vec3 vector);
 
 	//Scale
+	glm::vec3 getScale();
 	void scaleX(float amount);
     void scaleY(float amount);
     void scaleZ(float amount);

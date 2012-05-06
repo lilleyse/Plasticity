@@ -141,6 +141,11 @@ glm::vec3 PhysicsObject::getTranslation()
 }
 
 //Scale
+glm::vec3 PhysicsObject::getScale()
+{
+	btVector3 btScaleAmount = this->collisionObject->getCollisionShape()->getLocalScaling();
+	return Utils::convertBulletVectorToGLM(btScaleAmount);
+}
 void PhysicsObject::scaleX(float amount)
 {
     btVector3 scaleAmount = this->collisionObject->getCollisionShape()->getLocalScaling();

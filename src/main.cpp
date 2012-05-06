@@ -189,9 +189,9 @@ void initPhysics()
 
 	TriangleMeshPhysicsObject* floor = new TriangleMeshPhysicsObject(
 		Globals::meshLibrary.getMesh(5),0.0f,0.6f,0.8f,true,floorMaterial);
-	//floor->translateY(-10.0f);
-	floor->rotate(glm::vec3(1,0,0),0);
-	floor->setScale(glm::vec3(1,1,1));
+	floor->translateY(-10.0f);
+	floor->rotate(glm::vec3(1,0,0),.5);
+	floor->setScale(glm::vec3(.5,1,1));
 	physicsWorld->addRigidObject(floor);
 
 	//Bullet

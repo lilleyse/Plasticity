@@ -125,6 +125,7 @@ bool PhysicsWorld::processCollision(TriangleMeshPhysicsObject* ob, btRigidBody* 
 		for(int i = 0; i < numVertices; i++)
 		{
 			glm::vec3 vertex = glm::vec3(vertices[i].x, vertices[i].y, vertices[i].z);
+			vertex *= ob->getScale();
 			float distanceFromIntersection = glm::distance(intersectionPos,vertex);
 			float displacement = (material->breadth - distanceFromIntersection)/material->breadth;
 			displacement = glm::clamp(displacement, 0.0f, 1.0f);
