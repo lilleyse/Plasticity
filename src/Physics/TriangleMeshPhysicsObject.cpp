@@ -10,7 +10,7 @@ TriangleMeshPhysicsObject::TriangleMeshPhysicsObject(BaseMesh* baseMesh, float m
 	int numTriangles = baseMesh->elementArray.size()/3;
 	int vertexStride = sizeof(Vertex);
 	int indexStride = 3*sizeof(int);
-	int numVertices = baseMesh->vertices.size();
+	int numVertices = baseMesh->numVertices;
 
 	btTriangleIndexVertexArray* indexVertexArrays = new btTriangleIndexVertexArray(
 		numTriangles,attachedMesh->getElements(),indexStride,numVertices,

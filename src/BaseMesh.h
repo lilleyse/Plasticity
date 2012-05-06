@@ -15,15 +15,11 @@ class BaseMesh
 {
 public:
 
-	BaseMesh(std::vector<float>& positionData, std::vector<float>& normalsData, std::vector<unsigned short>& elementArray, bool initializeNeighbors = false);
+	BaseMesh(unsigned int numVertices, Vertex* vertexData, bool containsPositions, bool containsNormals, bool containsUVs, std::string& textureFileName, std::vector<unsigned short>& indexArray);
 
-	std::vector<Vertex> vertices;
+
+	Vertex* vertices;
+	int numVertices;
 	std::vector<unsigned short> elementArray;
 	std::vector<int> elementArrayForBullet;
-	std::map<int,std::vector<int>> elementNeighbors;
-
-	std::vector<int>& getNeighbors(int index);
-
-protected:
-	void initializeNeighbors();
 };

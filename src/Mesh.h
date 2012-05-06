@@ -21,7 +21,7 @@ struct NormalHelper
 class Mesh
 {
 public:
-	Mesh(BaseMesh* baseMesh);
+	Mesh(BaseMesh* baseMesh, GLenum usage);
 	~Mesh();
 
 	void render();

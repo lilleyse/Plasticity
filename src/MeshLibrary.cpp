@@ -5,36 +5,31 @@ MeshLibrary::~MeshLibrary(){}
 
 void MeshLibrary::initialize()
 {
-	ColladaData* data;
+	Loader loader;
+
 	std::string filename;
 
-	filename = "data/meshes/pumpkin.dae";
-	data = Loader::readColladaAsset(Utils::getFilePath(filename));
-	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray));
+	//should be pumpkin
+	filename = "data/meshes/cube.xml";
+	meshes.push_back(loader.readColladaAsset(Utils::getFilePath(filename)));
 
-	filename = "data/meshes/cube.dae";
-	data = Loader::readColladaAsset(Utils::getFilePath(filename));
-	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray));
+	filename = "data/meshes/cube.xml";
+	meshes.push_back(loader.readColladaAsset(Utils::getFilePath(filename)));
 
-	filename = "data/meshes/cylinder.dae";
-	data = Loader::readColladaAsset(Utils::getFilePath(filename));
-	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray));
+	filename = "data/meshes/cylinder.xml";
+	meshes.push_back(loader.readColladaAsset(Utils::getFilePath(filename)));
 
-	filename = "data/meshes/sphere.dae";
-	data = Loader::readColladaAsset(Utils::getFilePath(filename));
-	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray));
+	filename = "data/meshes/sphere.xml";
+	meshes.push_back(loader.readColladaAsset(Utils::getFilePath(filename)));
+	
+	filename = "data/meshes/weirdConcave.xml";
+	meshes.push_back(loader.readColladaAsset(Utils::getFilePath(filename)));
 
-	filename = "data/meshes/weirdConcave.dae";
-	data = Loader::readColladaAsset(Utils::getFilePath(filename));
-	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray));
+	filename = "data/meshes/subdividedFloor.xml";
+	meshes.push_back(loader.readColladaAsset(Utils::getFilePath(filename)));
 
-	filename = "data/meshes/subdividedFloor.dae";
-	data = Loader::readColladaAsset(Utils::getFilePath(filename));
-	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray,true));
-
-	filename = "data/meshes/sphereFloor.dae";
-	data = Loader::readColladaAsset(Utils::getFilePath(filename));
-	meshes.push_back(new BaseMesh(data->positionData, data->normalsData, data->elementArray,true));
+	filename = "data/meshes/sphereFloor.xml";
+	meshes.push_back(loader.readColladaAsset(Utils::getFilePath(filename)));
 }
 
 BaseMesh* MeshLibrary::getMesh(int number)

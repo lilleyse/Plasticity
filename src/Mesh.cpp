@@ -1,15 +1,17 @@
 #include "Mesh.h"
 
-Mesh::Mesh(BaseMesh* baseMesh)
+Mesh::Mesh(BaseMesh* baseMesh, GLenum usage)
 {
-	numVertices = baseMesh->vertices.size();
+
+	numVertices = baseMesh->numVertices;
 	numElements = baseMesh->elementArray.size();
 
 	normalHelperArray = new NormalHelper[numVertices];
 
+
+
 	this->baseMesh = baseMesh;
-	vertices = new Vertex[numVertices];
-	memcpy(vertices, &baseMesh->vertices[0], sizeof(Vertex)*numVertices);
+	this->vertices = baseMesh->vertices;
 
 	//create and bind array buffer, set data
     glGenBuffers(1, &arrayBufferObject);
@@ -20,7 +22,7 @@ Mesh::Mesh(BaseMesh* baseMesh)
     //create and bind element array buffer, set data to the stored element array, then close buffer
     glGenBuffers(1, &elementBufferObject);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort)*numElements, &baseMesh->elementArray[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort)*numElements, &baseMesh->elementArray[0], usage);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	//create and bind vao

@@ -2,9 +2,9 @@
 
 SoftPhysicsObject::SoftPhysicsObject(BaseMesh* baseMesh, int bendingConstraints, int iterations, float mass, float restitution, float friction)
 {
-	this->attachedMesh = new Mesh(baseMesh);
+	this->attachedMesh = new Mesh(baseMesh, GL_STREAM_DRAW);
 	int numTriangles = baseMesh->elementArray.size()/3;
-	int numVertices = baseMesh->vertices.size();
+	int numVertices = baseMesh->numVertices;
 	Vertex* vertexData = this->attachedMesh->getVertices();
 
 	float *vertices = new float[numVertices*3];

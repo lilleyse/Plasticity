@@ -2,7 +2,6 @@
 
 #include "BaseMesh.h"
 #include <vector>
-#include "ColladaData.h"
 #include "Loader.h"
 
 class MeshLibrary

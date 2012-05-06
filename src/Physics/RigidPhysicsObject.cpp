@@ -2,12 +2,12 @@
 
 RigidPhysicsObject::RigidPhysicsObject(BaseMesh* baseMesh) : PhysicsObject()
 {
-	this->attachedMesh = new Mesh(baseMesh);
+	this->attachedMesh = new Mesh(baseMesh, GL_DYNAMIC_DRAW);
 }
 RigidPhysicsObject::RigidPhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh,
 	float mass, float restitution, float friction) : PhysicsObject()
 {
-	this->attachedMesh = new Mesh(baseMesh);
+	this->attachedMesh = new Mesh(baseMesh, GL_STATIC_DRAW);
 	if(type == PRIMITIVE_BOX)
 	{
 		this->collisionShape = new btBoxShape(btVector3(1.0f,1.0f,1.0f));

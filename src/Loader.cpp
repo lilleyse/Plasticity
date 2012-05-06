@@ -5,221 +5,198 @@ Loader::Loader()
 
 }
 
-std::vector<float> Loader::parsePositionData(const std::string& configData, size_t size, float& width, float& height, float& depth)
-{
-    float xMin = FLT_MAX;
-	float yMin = FLT_MAX;
-	float zMin = FLT_MAX;
-
-    float xMax =  -FLT_MAX;
-    float yMax =  -FLT_MAX;
-    float zMax =  -FLT_MAX;
-
-    std::vector<float> floats;
-    floats.reserve(size);
-    char* cstr;
-    char* p;
-    cstr = new char [configData.size()+1];
-    strcpy (cstr, configData.c_str());
-
-    p = strtok (cstr," ");
-    while (p!=0)
-    {
-		//convert strings to floats
-        float x = (float)std::atof(p);
-        p=strtok(0," ");
-        float y = (float)std::atof(p);
-        p=strtok(0," ");
-        float z = (float)std::atof(p);
-        p=strtok(0," ");
-
-        floats.push_back(x);
-        floats.push_back(y);
-        floats.push_back(z);
-
-		//test for the min and max x,y,z dimensions
-        if(x < xMin) xMin = x;
-        else if(x > xMax) xMax = x;
-        if(y < yMin) yMin = y;
-        else if(y > yMax) yMax = y;
-        if(z < zMin) zMin = z;
-        else if(z > zMax) zMax = z;
-    }
-    delete[] cstr;
-    delete[] p;
-
-    width = xMax - xMin;
-    height = yMax - yMin;
-    depth = zMax - zMin;
-
-    return floats;
-}
-
-
 std::vector<float> Loader::parseDataIntoFloats(const std::string& configData, size_t size)
 {
-    std::vector<float> floats;
+
+	std::vector<float> floats;
     floats.reserve(size);
-    char* cstr;
-    char* p;
-    cstr = new char [configData.size()+1];
-    strcpy (cstr, configData.c_str());
 
-    p = strtok (cstr," ");
-    while (p!=0)
-    {
-        floats.push_back((float)std::atof(p));
-        p=strtok(0," ");
-    }
-    delete[] cstr;
-    delete[] p;
+	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+	boost::char_separator<char> sep(" ");
+	tokenizer tokens(configData, sep);
+	for (tokenizer::iterator tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter)
+	{
+		floats.push_back((float)std::atof((*tok_iter).c_str()));
+	}
 
-    return floats;
+	return floats;
 }
 
 std::vector<unsigned short> Loader::parseDataIntoUShorts(const std::string& configData, size_t size)
 {
     std::vector<unsigned short> ushorts;
     ushorts.reserve(size);
-    char* cstr;
-    char* p;
-    cstr = new char [configData.size()+1];
-    strcpy (cstr, configData.c_str());
-
-    p = strtok (cstr," ");
-    while (p!=0)
-    {
-
-        ushorts.push_back((unsigned short)std::atoi(p));
-        p=strtok(0," ");
-    }
-    delete[] cstr;
-    delete[] p;
+    
+	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+	boost::char_separator<char> sep(" ");
+	tokenizer tokens(configData, sep);
+	for (tokenizer::iterator tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter)
+	{
+		ushorts.push_back((unsigned short)std::atoi((*tok_iter).c_str()));
+	}   
 
     return ushorts;
 }
 
 
-void Loader::loadGeometry(domGeometry* geom, ColladaData* outputData)
+glm::mat4 Loader::parseDataIntoMat4(const std::string& configData)
 {
-	bool sourcesLoaded = false;
-
-	std::vector<GLushort> elementArray;
-
-
-	//loop over the triangle draw commands on this geometry
-	for (size_t i = 0; i < geom->getMesh()->getTriangles_array().getCount(); i++) {
-			
-		domTriangles* triangleDraw = geom->getMesh()->getTriangles_array()[i];
-			
-		//only load the source data if the source data hasn't already been loaded.
-		//multiple triangle draw calls will end up referencing the same data
-		if(!sourcesLoaded)
-		{
-			sourcesLoaded = true;
-
-			//loop over the source inputs (positions, normals, tex coords) for this draw call
-			for (size_t i = 0; i < triangleDraw->getInput_array().getCount(); i++) {
-				
-				domInputLocalOffset* input = triangleDraw->getInput_array()[i];
-				std::string semantic = input->getSemantic();
-				
-				if(semantic == "VERTEX")
-				{
-					domVertices* vertexSource = daeSafeCast<domVertices>(input->getSource().getElement());
-					domSource* positionsSource = daeSafeCast<domSource>(vertexSource->getInput_array()[0]->getSource().getElement());
-
-					std::string positionsData = positionsSource->getFloat_array()->getCharData();
-					unsigned int size = (unsigned int)positionsSource->getFloat_array()->getCount();
-					float width;
-					float height;
-					float depth;
-
-					//set the positions for the output mesh
-					outputData->positionData = parsePositionData(positionsData, size, width, height, depth);
-					outputData->numVertices = size/3;
-
-					//set the dimensions for the output mesh
-					outputData->width = width;
-					outputData->height = height;
-					outputData->depth = depth;
-					
-
-				}
-				else if(semantic == "NORMAL")
-				{
-					domSource* normalsSource = daeSafeCast<domSource>(input->getSource().getElement());
-					std::string normalsData = normalsSource->getFloat_array()->getCharData();
-					unsigned int size = (unsigned int) normalsSource->getFloat_array()->getCount();
-
-					//set the normals for the output mesh
-					outputData->normalsData = parseDataIntoFloats(normalsData, size);
-				}
-				else if(semantic == "TEXCOORD")
-				{
-					/*domSource* textureSource = daeSafeCast<domSource>(input->getSource().getElement());
-					std::string textureData = textureSource->getFloat_array()->getCharData();
-					unsigned int size = (unsigned int) textureSource->getFloat_array()->getCount();
-					outputData->textureData = parseDataIntoFloats(textureData, size);
-					
-					//TODO: loading image in a very hardcoded fashion...only works if one image is present in the collada file
-					
-					domImage* textureImage = daeSafeCast<domImage>(geom->getParentElement()->getParentElement()->getDescendant("image"));
-					std::string filepath = textureImage->getInit_from()->getCharData();
-					unsigned int namePos = filepath.find_last_of('/') + 1;
-					filepath = filepath.substr(namePos);
-					std::cout << filepath << std::endl;
-					outputData->textureFileName = filepath;*/
-				}
-			}
-		}
-
-		//look at the index array
-		unsigned int numIndices = (unsigned int) triangleDraw->getCount()*3;
-		std::string indexArrayData = triangleDraw->getP()->getCharData();
-
-		//set the index array for the output mesh
-		std::vector<GLushort> elementArrayAdd = parseDataIntoUShorts(indexArrayData, numIndices);
-		elementArray.insert(elementArray.end(), elementArrayAdd.begin(), elementArrayAdd.end());
-			
-
-	}
-
-	//set the draw type for the output mesh
-	outputData->primitiveType = GL_TRIANGLES;
-	outputData->elementArray = elementArray;
+	//its ROW ORDER. Meaning the first 4 floats are the first row, not the first column
+	std::vector<float> floats = parseDataIntoFloats(configData, 16);
 	
+	glm::mat4 matrix(0);
+	matrix[0].x = floats[0];
+	matrix[1].x = floats[1];
+	matrix[2].x = floats[2];
+	matrix[3].x = floats[3];
+
+	matrix[0].y = floats[4];
+	matrix[1].y = floats[5];
+	matrix[2].y = floats[6];
+	matrix[3].y = floats[7];
+
+	matrix[0].z = floats[8];
+	matrix[1].z = floats[9];
+	matrix[2].z = floats[10];
+	matrix[3].z = floats[11];
+
+	matrix[0].w = floats[12];
+	matrix[1].w = floats[13];
+	matrix[2].w = floats[14];
+	matrix[3].w = floats[15];
+
+    return matrix;
 }
 
-ColladaData* Loader::readColladaAsset(std::string& fileName)
+std::vector<glm::vec3> Loader::parseTranslationData(const std::string& configData, int numTranslations)
 {
-	ColladaData* outputData = new ColladaData();
-
-	DAE dae;
-	//std::string filename = Utils::getFilePath("data/test.dae");
-
-	daeElement* root = dae.open(fileName);
-	if (!root) {
-		std::cout << "Document import failed.\n";
-		return 0;
-	}
-
-
-	domVisual_scene* visualScene = daeSafeCast<domVisual_scene>(root->getDescendant("visual_scene"));
-	domNode_Array& nodes = visualScene->getNode_array();
-	for (size_t i = 0; i < nodes.getCount(); i++)
+	//its ROW ORDER. Meaning the first 4 floats are the first row, not the first column
+	std::vector<glm::vec3> translationValues;
+    translationValues.reserve(numTranslations);
+	std::vector<float> floats = parseDataIntoFloats(configData, numTranslations*3);
+	for(int i = 0; i < numTranslations; i++)
 	{
-
-		//if this node is a geometry node
-		if(nodes[i]->getInstance_geometry_array().getCount() == 1)
-		{
-			domInstance_geometry* instanceGeom = nodes[i]->getInstance_geometry_array()[0];
-			domGeometry* geom = daeSafeCast<domGeometry>(instanceGeom->getUrl().getElement());
-			loadGeometry(geom, outputData);
-		}
+		float x = floats[i*3 + 0];
+		float y = floats[i*3 + 1];
+		float z = floats[i*3 + 2];
+		translationValues.push_back(glm::vec3(x,y,z));
 	}
-	
-	return outputData;
+   
+    return translationValues;
+}
 
+std::vector<glm::fquat> Loader::parseQuatData(const std::string& configData, int numQuats)
+{
+	//its ROW ORDER. Meaning the first 4 floats are the first row, not the first column
+	std::vector<glm::fquat> quatValues;
+    quatValues.reserve(numQuats);
+	std::vector<float> floats = parseDataIntoFloats(configData, numQuats*4);
+	for(int i = 0; i < numQuats; i++)
+	{
+		float x = floats[i*3 + 0];
+		float y = floats[i*3 + 1];
+		float z = floats[i*3 + 2];
+		float w = floats[i*3 + 3];
+		quatValues.push_back(glm::fquat(x,y,z,w));
+	}
+   
+    return quatValues;
+}
+
+Vertex* Loader::loadVertexDataForStaticMesh(TiXmlElement* vertexData, int& numVertices, bool& containsPositions, bool& containsNormals, bool& containsUVs)
+{
+	std::string vertexCountString = vertexData->Attribute("count");
+	numVertices = atoi(vertexCountString.c_str());
+
+	TiXmlElement* positionElement = vertexData->FirstChildElement("position");
+	std::string positionData = positionElement->FirstChild()->Value();
+	if(positionData == "") containsPositions = false; else containsPositions = true;
+	float width = (float)atof(positionElement->Attribute("width"));
+	float height = (float)atof(positionElement->Attribute("height"));
+	float depth = (float)atof(positionElement->Attribute("depth"));
+	
+	std::string normalData = vertexData->FirstChildElement("normal")->FirstChild()->Value();
+	if(normalData == "") containsNormals = false; else containsNormals = true;
+	std::string UVData = "";//vertexData->FirstChildElement("UV")->FirstChild()->Value();
+	if(UVData == "") containsUVs = false; else containsUVs = true;
+   
+	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+	boost::char_separator<char> sep(" ");
+	tokenizer positionTokens(positionData, sep);
+	tokenizer normalsTokens(normalData, sep);
+	tokenizer UVTokens(UVData, sep);
+
+	tokenizer::iterator positionsIter = positionTokens.begin();
+	tokenizer::iterator normalsIter = normalsTokens.begin();
+	tokenizer::iterator UVIter = UVTokens.begin();
+
+	Vertex* vertices = new Vertex[numVertices];
+
+	for(int i = 0; i < numVertices; i++)
+	{
+		if(containsPositions)
+		{
+			vertices[i].x = (float)std::atof((*(positionsIter++)).c_str());
+			vertices[i].y = (float)std::atof((*(positionsIter++)).c_str());
+			vertices[i].z = (float)std::atof((*(positionsIter++)).c_str());
+		}
+
+		if(containsNormals)
+		{
+			vertices[i].nx = (float)std::atof((*(normalsIter++)).c_str());
+			vertices[i].ny = (float)std::atof((*(normalsIter++)).c_str());
+			vertices[i].nz = (float)std::atof((*(normalsIter++)).c_str());
+		}
+
+		if(containsUVs)
+		{
+			vertices[i].s = (float)std::atof((*(UVIter++)).c_str());
+			vertices[i].t = (float)std::atof((*(UVIter++)).c_str());
+		}
+	}   
+
+	return vertices;
+
+}
+
+BaseMesh* Loader::readColladaAsset(std::string& fileName)
+{
+	std::string fullFilepath = Utils::getFilePath(fileName);
+	TiXmlDocument doc;
+	doc.LoadFile(fullFilepath.c_str());
+	if(doc.Error())
+		throw std::runtime_error(doc.ErrorDesc());
+	TiXmlHandle docHandle(&doc);
+
+	TiXmlElement* header = docHandle.FirstChildElement("Mesh").ToElement();
+
+	std::string headerType = header->Attribute("type");
+
+	TiXmlElement* elementArrayElement = header->FirstChildElement("element_array");
+	int numElements = atoi(elementArrayElement->Attribute("count"));
+	std::vector<unsigned short> elementArray = parseDataIntoUShorts(elementArrayElement->FirstChild()->Value(), numElements);
+
+	//the texture name may be ""
+	std::string textureName = "";//header->FirstChildElement("texture_name")->FirstChild()->Value();
+
+	TiXmlElement* vertexDataElement = header->FirstChildElement("vertex_data");
+	int numVertices;
+	bool containsPositions;
+	bool containsNormals;
+	bool containsUVs;
+
+
+
+	if(headerType == "static")
+	{
+		Vertex* vertexData = loadVertexDataForStaticMesh(vertexDataElement, numVertices, containsPositions, containsNormals, containsUVs);
+		BaseMesh* baseMesh = new BaseMesh(numVertices, vertexData, containsPositions, containsNormals, containsUVs, textureName, elementArray);    
+		return baseMesh;
+	}
+
+	//maybe not needed
+	//std::string name = docHandle.FirstChild("info").ToElement()->FirstChildElement("name")->FirstChild()->Value();
+
+	return 0;
 
 }

@@ -1,31 +1,26 @@
 #pragma once
 
-
+#include <tinyxml/tinyxml.h>
+#include "BaseMesh.h"
 #include "Utils.h"
-#include "ColladaData.h"
-
-#include <gl3w/gl3w.h>
-#include <dae.h>
-#include <dom/domCOLLADA.h>
-
-
+#include <boost/tokenizer.hpp>
+#include "glm/gtx/quaternion.hpp"
 
 
 class Loader
 {
 public:
 	Loader();
-	static ColladaData* readColladaAsset(std::string& fileName);
+	BaseMesh* readColladaAsset(std::string& fileName);
 
 private:
-	
-	static void loadGeometry(domGeometry* geom, ColladaData* outputData);
+	Vertex* loadVertexDataForStaticMesh(TiXmlElement* vertexData, int& numVertices, bool& containsPositions, bool& containsNormals, bool& containsUVs);
+	std::vector<float> parseDataIntoFloats(const std::string& configData, size_t size);
+	std::vector<unsigned short> parseDataIntoUShorts(const std::string& configData, size_t size);
+	glm::mat4 parseDataIntoMat4(const std::string& configData);
+	std::vector<glm::vec3> Loader::parseTranslationData(const std::string& configData, int numTranslations);
+	std::vector<glm::fquat> Loader::parseQuatData(const std::string& configData, int numQuats);
 
-	//Parses a space-separated string of position data into a vector of floats. Finds the width, height, depth of the given positions
-	static std::vector<float> parsePositionData(const std::string& configData, size_t size, float& width, float& height, float& depth);
-	static std::vector<float> parseDataIntoFloats(const std::string& configData, size_t size);
-	static std::vector<unsigned short> parseDataIntoUShorts(const std::string& configData, size_t size);
-	
 };
 
 
