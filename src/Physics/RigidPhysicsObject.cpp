@@ -1,6 +1,6 @@
 #include "RigidPhysicsObject.h"
 
-RigidPhysicsObject::RigidPhysicsObject(BaseMesh* baseMesh)
+RigidPhysicsObject::RigidPhysicsObject(BaseMesh* baseMesh) : PhysicsObject()
 {
 	this->attachedMesh = new Mesh(baseMesh);
 }
@@ -22,6 +22,7 @@ RigidPhysicsObject::RigidPhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh,
 	}
 	this->collisionShape->setUserPointer((void*)0);
 	this->createRigidBody(mass,friction,restitution);
+	//this->collisionObject->activate(true);
 }
 RigidPhysicsObject::~RigidPhysicsObject(){}
 
@@ -42,4 +43,11 @@ void RigidPhysicsObject::createRigidBody(float mass, float friction, float resti
 	this->collisionObject->setRestitution(restitution);
 	this->collisionObject->setCcdMotionThreshold(.1f);
 	this->collisionObject->setCcdSweptSphereRadius(.1f);
+}
+
+//Update
+void RigidPhysicsObject::update()
+{
+	PhysicsObject::update();
+	//this->collisionObject->activate(true);
 }

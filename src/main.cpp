@@ -185,7 +185,7 @@ void initPhysics()
 	floorMaterial->maxMagnitude = 1.0f;
 	floorMaterial->breadth = 14.0f;
 	floorMaterial->malleability = 0.5f;
-	floorMaterial->falloff = 1.0f;
+	floorMaterial->falloff = 2.0f;
 
 	TriangleMeshPhysicsObject* floor = new TriangleMeshPhysicsObject(
 		Globals::meshLibrary.getMesh(5),0.0f,0.6f,0.8f,true,floorMaterial);

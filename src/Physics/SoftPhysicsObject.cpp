@@ -27,6 +27,8 @@ SoftPhysicsObject::SoftPhysicsObject(BaseMesh* baseMesh, int bendingConstraints,
 	softBody->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
 	softBody->randomizeConstraints();
 	softBody->setTotalMass(mass,true);
+
+	//this->collisionObject->activate(true);
 }
 SoftPhysicsObject::~SoftPhysicsObject(){}
 

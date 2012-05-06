@@ -106,10 +106,7 @@ void PhysicsWorld::refitMesh(TriangleMeshPhysicsObject* object)
 }
 bool PhysicsWorld::processCollision(TriangleMeshPhysicsObject* ob, btRigidBody* other, btManifoldPoint& pt, btVector3& pos, btVector3& normal)
 {
-	
-
 	PlasticityMaterial* material = ob->material;
-
 	btVector3 projectileVelocity = other->getLinearVelocity();
 	btVector3 projectileVelocityNorm = projectileVelocity;
 	projectileVelocityNorm.normalize();
@@ -129,16 +126,17 @@ bool PhysicsWorld::processCollision(TriangleMeshPhysicsObject* ob, btRigidBody* 
 		{
 			glm::vec3 vertex = glm::vec3(vertices[i].x, vertices[i].y, vertices[i].z);
 			float distanceFromIntersection = glm::distance(intersectionPos,vertex);
-			float clampedDistance = glm::clamp((material->breadth - distanceFromIntersection)/material->breadth, 0.0f, 1.0f);
-			vertices[i].x -= normal.getX()*magnitude*clampedDistance;
-			vertices[i].y -= normal.getY()*magnitude*clampedDistance;
-			vertices[i].z -= normal.getZ()*magnitude*clampedDistance;
+			float displacement = (material->breadth - distanceFromIntersection)/material->breadth;
+			displacement = glm::clamp(displacement, 0.0f, 1.0f);
+			displacement = std::pow(displacement, material->falloff);
+			vertices[i].x -= normal.getX()*magnitude*displacement;
+			vertices[i].y -= normal.getY()*magnitude*displacement;
+			vertices[i].z -= normal.getZ()*magnitude*displacement;
 		}
 		mesh->updateNormals();
 		mesh->updateVertices();
 		return true;
 	}
-
 	return false;
 }
 

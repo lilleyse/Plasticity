@@ -28,6 +28,9 @@ public:
 	RigidPhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh, float mass, float restitution, float friction);
 	~RigidPhysicsObject();
 
+	//Update
+	virtual void update();
+
 protected:
 
 	void createRigidBody(float mass, float friction, float restitution);

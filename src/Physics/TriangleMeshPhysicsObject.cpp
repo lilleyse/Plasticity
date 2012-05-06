@@ -33,5 +33,6 @@ TriangleMeshPhysicsObject::TriangleMeshPhysicsObject(BaseMesh* baseMesh, float m
 		this->collisionShape = trimesh;
 	}
 	this->createRigidBody(mass,friction,restitution);
+	//this->collisionObject->activate(true);
 }
 TriangleMeshPhysicsObject::~TriangleMeshPhysicsObject(){}
