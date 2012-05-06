@@ -8,6 +8,7 @@ PhysicsWorld::PhysicsWorld()
 	this->solver = new btSequentialImpulseConstraintSolver();
 	this->world = new btSoftRigidDynamicsWorld(this->dispatcher,this->broadphase,this->solver,this->collisionConfiguration);
 	this->world->setGravity(btVector3(0,-10,0));
+	btGImpactCollisionAlgorithm::registerAlgorithm(this->dispatcher);
 }
 PhysicsWorld::~PhysicsWorld(){}
 
@@ -25,6 +26,19 @@ void PhysicsWorld::processCollisions()
 		btRigidBody* obA = static_cast<btRigidBody*>(contactManifold->getBody0());
 		btRigidBody* obB = static_cast<btRigidBody*>(contactManifold->getBody1());
 
+		//check if obA and obB are dentable
+		bool obADentable = false;
+		TriangleMeshPhysicsObject* obATriMesh = this->convertRigidBodyToTriangleMeshPhysicsObject(obA);
+		if(obATriMesh != 0 && obATriMesh->dentable)
+			obADentable = true;
+
+		bool obBDentable = false;
+		TriangleMeshPhysicsObject* obBTriMesh = this->convertRigidBodyToTriangleMeshPhysicsObject(obB);
+		if(obBTriMesh != 0 && obBTriMesh->dentable)
+			obBDentable = true;
+
+
+
 		int numContacts = contactManifold->getNumContacts();
 		for (int j=0;j<numContacts;j++)
 		{
@@ -35,65 +49,115 @@ void PhysicsWorld::processCollisions()
 			btVector3 ptB = pt.m_localPointB;//pt.getPositionWorldOnB();
 			btVector3 normalOnB = pt.m_normalWorldOnB;
 			btVector3 normalOnA = -pt.m_normalWorldOnB;
-			float impulse = pt.m_appliedImpulse;
-			this->processCollision(obA,pt,indexA,ptA,normalOnA);
-			this->processCollision(obB,pt,indexB,ptB,normalOnB);
+			bool obADeformed = false;
+			bool obBDeformed = false;
+			if(obADentable) obADeformed = this->processCollision(obATriMesh,obB,pt,ptA,normalOnA);
+			if(obBDentable) obBDeformed = this->processCollision(obBTriMesh,obA,pt,ptB,normalOnB);
+			
+			if(obADeformed || obBDeformed)
+			{
+				this->dampenBounce(obA,pt,normalOnA);
+				this->dampenBounce(obB,pt,normalOnB);
+			}
 		}
 
-		if(obB->getCollisionShape()->isConcave())
+		if(numContacts > 0)
 		{
-			btBvhTriangleMeshShape* trimesh = (btBvhTriangleMeshShape*)(obB->getCollisionShape());
-			//trimesh->postUpdate();
-			float dim = 100000;
-			btVector3 aabbMin(-dim,-dim,-dim);
-			btVector3 aabbMax(dim,dim,dim);
-			trimesh->refitTree(aabbMin,aabbMax);
-			//this->world->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(obA->getBroadphaseHandle(),this->world->getDispatcher());
-			//this->world->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(obB->getBroadphaseHandle(),this->world->getDispatcher());
+			if(obADentable) this->refitMesh(obATriMesh);
+			if(obBDentable) this->refitMesh(obBTriMesh);
 		}
-		
 	}
 }
 
-void PhysicsWorld::processCollision(btRigidBody* ob, btManifoldPoint& pt, int triIndex, btVector3& pos, btVector3& normal)
+//Fixes the mesh shape if it is dentable
+void PhysicsWorld::refitMesh(TriangleMeshPhysicsObject* object)
 {
-	float threshhold = .3f;
-	float maxMagnitude = 2.0f;
-	if(ob->getCollisionShape()->isConcave())
+	//object->setActivationState(DISABLE_DEACTIVATION);
+
+	btBvhTriangleMeshShape* bvhTrimesh = dynamic_cast<btBvhTriangleMeshShape*>(object->getCollisionShape());
+	btGImpactMeshShape* gimpactTrimesh = dynamic_cast<btGImpactMeshShape*>(object->getCollisionShape());
+	if(bvhTrimesh != 0)
 	{
-		float impulse = pt.m_appliedImpulse;
-		float distance = pt.getDistance();
-		if (distance < 0.f && impulse > threshhold)
-		{
-			glm::vec3 intersectionPos = Utils::convertBulletVectorToGLM(pos);
-			btCollisionShape* trimesh = ob->getCollisionShape();
-			Mesh* mesh = (Mesh*)trimesh->getUserPointer();
-			Vertex* vertices = mesh->getVertices();
-			int numVertices = mesh->numVertices;
-
-			//Update the positions for all neighbors around the intersection point
-			float range = 5.0f;
-			float magnitude = -impulse*.5f;
-			if(magnitude < -maxMagnitude) magnitude = -maxMagnitude;
-			for(int i = 0; i < numVertices; i++)
-			{
-				glm::vec3 vertex = glm::vec3(vertices[i].x, vertices[i].y, vertices[i].z);
-				float distanceFromIntersection = glm::distance(intersectionPos,vertex);
-				float clampedDistance = glm::clamp((range - distanceFromIntersection)/range, 0.0f, 1.0f);
-				vertices[i].x += normal.getX()*magnitude*clampedDistance;
-				vertices[i].y += normal.getY()*magnitude*clampedDistance;
-				vertices[i].z += normal.getZ()*magnitude*clampedDistance;
-			}
-
-			mesh->updateNormals();
-			mesh->updateVertices();
-
-			//Clean the intersections
-			//trimesh->postUpdate();
-			//trimeshe->partialRefitTree(aabbMin,aabbMax);
-			//this->world->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(ob->getBroadphaseHandle(),this->world->getDispatcher());
-		}
+		float dim = 100000;
+		btVector3 aabbMin(-dim,-dim,-dim);
+		btVector3 aabbMax(dim,dim,dim);
+		bvhTrimesh->refitTree(aabbMin,aabbMax);
 	}
+	else if(gimpactTrimesh != 0)
+	{
+		//gimpactTrimesh->postUpdate();
+		//gimpactTrimesh->updateBound();
+
+		//float dim = 100000;
+		//btVector3 aabbMin(-dim,-dim,-dim);
+		//btVector3 aabbMax(dim,dim,dim);
+		//btTransform identity;
+		//identity.setIdentity();
+		//gimpactTrimesh->getAabb(identity,aabbMin,aabbMax);
+
+		gimpactTrimesh->postUpdate();
+		gimpactTrimesh->updateBound();
+		//Might not work
+			
+			
+	}
+	//
+	//this->world->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(obB->getBroadphaseHandle(),this->world->getDispatcher());
+}
+bool PhysicsWorld::processCollision(TriangleMeshPhysicsObject* ob, btRigidBody* other, btManifoldPoint& pt, btVector3& pos, btVector3& normal)
+{
+	
+
+	PlasticityMaterial* material = ob->material;
+
+	btVector3 projectileVelocity = other->getLinearVelocity();
+	btVector3 projectileVelocityNorm = projectileVelocity;
+	projectileVelocityNorm.normalize();
+	btScalar projectileVelocityLength = projectileVelocity.length();
+	float impulse = normal.dot(projectileVelocityNorm)*projectileVelocityLength;//pt.m_appliedImpulse;
+	float distance = pt.getDistance();
+	if (distance < 0.f && impulse > material->threshold)
+	{
+		//Update the positions for all neighbors around the intersection point
+		glm::vec3 intersectionPos = Utils::convertBulletVectorToGLM(pos);
+		float magnitude = std::min(impulse*material->malleability, material->maxMagnitude);
+			
+		Mesh* mesh = ob->getAttachedMesh();
+		Vertex* vertices = mesh->getVertices();
+		int numVertices = mesh->numVertices;
+		for(int i = 0; i < numVertices; i++)
+		{
+			glm::vec3 vertex = glm::vec3(vertices[i].x, vertices[i].y, vertices[i].z);
+			float distanceFromIntersection = glm::distance(intersectionPos,vertex);
+			float clampedDistance = glm::clamp((material->breadth - distanceFromIntersection)/material->breadth, 0.0f, 1.0f);
+			vertices[i].x -= normal.getX()*magnitude*clampedDistance;
+			vertices[i].y -= normal.getY()*magnitude*clampedDistance;
+			vertices[i].z -= normal.getZ()*magnitude*clampedDistance;
+		}
+		mesh->updateNormals();
+		mesh->updateVertices();
+		return true;
+	}
+
+	return false;
+}
+
+void PhysicsWorld::dampenBounce(btRigidBody* ob, btManifoldPoint& pt, btVector3& normal)
+{
+	//ob->setLinearVelocity(-ob->getLinearVelocity()/2);
+	ob->applyCentralForce(normal*5*pt.m_appliedImpulse);
+}
+
+TriangleMeshPhysicsObject* PhysicsWorld::convertRigidBodyToTriangleMeshPhysicsObject(btRigidBody* object)
+{
+	btCollisionShape* trimesh = object->getCollisionShape();
+	void* userData = trimesh->getUserPointer();
+	if(userData != 0)
+	{
+		TriangleMeshPhysicsObject* physicsObject = (TriangleMeshPhysicsObject*)(userData);
+		return physicsObject;
+	}
+	return 0;
 }
 void PhysicsWorld::addRigidObject(RigidPhysicsObject* object)
 {

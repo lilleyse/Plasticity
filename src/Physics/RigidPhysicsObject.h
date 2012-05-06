@@ -3,8 +3,7 @@
 #include <iostream>
 
 #include <bullet/btBulletDynamicsCommon.h>
-#include <bullet/BulletCollision/Gimpact/btGImpactShape.h>
-#include <bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
+
 #include <glm/glm.hpp>
 
 #include "PhysicsObject.h"
@@ -25,11 +24,9 @@ class RigidPhysicsObject : public PhysicsObject
 public:
 
 	//Constructors
+	RigidPhysicsObject(BaseMesh* baseMesh);
 	RigidPhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh, float mass, float restitution, float friction);
 	~RigidPhysicsObject();
-
-	//Update
-	virtual void update();
 
 protected:
 

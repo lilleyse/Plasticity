@@ -1,5 +1,9 @@
 #include "RigidPhysicsObject.h"
 
+RigidPhysicsObject::RigidPhysicsObject(BaseMesh* baseMesh)
+{
+	this->attachedMesh = new Mesh(baseMesh);
+}
 RigidPhysicsObject::RigidPhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh,
 	float mass, float restitution, float friction) : PhysicsObject()
 {
@@ -14,36 +18,9 @@ RigidPhysicsObject::RigidPhysicsObject(PRIMITIVE_TYPE type, BaseMesh* baseMesh,
 	}
 	else if(type == PRIMITIVE_MESH)
 	{
-		int numTriangles = baseMesh->elementArray.size()/3;
-		int vertexStride = sizeof(Vertex);
-		int indexStride = 3*sizeof(int);
-		int numVertices = baseMesh->vertices.size();
-
-		btTriangleIndexVertexArray* indexVertexArrays = new btTriangleIndexVertexArray(
-			numTriangles,
-			attachedMesh->getElements(),
-			indexStride,
-			numVertices,
-			(float*)attachedMesh->getVertices(),
-			vertexStride);
-
-		if(mass == 0)
-		{
-			float dim = 100000;
-			btVector3 aabbMin(-dim,-dim,-dim);
-			btVector3 aabbMax(dim,dim,dim);
-			btBvhTriangleMeshShape* trimesh = new btBvhTriangleMeshShape(indexVertexArrays,true,aabbMin,aabbMax);
-			trimesh->setUserPointer(this->getAttachedMesh());
-			this->collisionShape = trimesh;
-		}
-		else
-		{
-			btGImpactMeshShape * trimesh = new btGImpactMeshShape(indexVertexArrays);
-			trimesh->updateBound();
-			trimesh->setUserPointer(this->getAttachedMesh());
-			this->collisionShape = trimesh;
-		}
+		std::cout << "Should not be creating a triangle mesh here!" << std::endl;
 	}
+	this->collisionShape->setUserPointer((void*)0);
 	this->createRigidBody(mass,friction,restitution);
 }
 RigidPhysicsObject::~RigidPhysicsObject(){}
@@ -65,9 +42,4 @@ void RigidPhysicsObject::createRigidBody(float mass, float friction, float resti
 	this->collisionObject->setRestitution(restitution);
 	this->collisionObject->setCcdMotionThreshold(.1f);
 	this->collisionObject->setCcdSweptSphereRadius(.1f);
-}
-
-void RigidPhysicsObject::update()
-{
-	//attachedMesh->updateNormals();
 }

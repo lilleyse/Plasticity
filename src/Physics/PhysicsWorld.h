@@ -8,6 +8,7 @@
 #include <bullet/BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
 #include <bullet/BulletSoftBody/btSoftBodyHelpers.h>
 
+#include "TriangleMeshPhysicsObject.h"
 #include "PhysicsObject.h"
 #include "RigidPhysicsObject.h"
 #include "SoftPhysicsObject.h"
@@ -23,9 +24,7 @@ public:
 	void addSoftObject(SoftPhysicsObject* object);
 
 	void update();
-	void processCollisions();
-	void processCollision(btRigidBody* ob, btManifoldPoint& pt, int triIndex, btVector3& pos, btVector3& normal);
-
+	
 	btDefaultCollisionConfiguration* collisionConfiguration;
 	btSoftRigidDynamicsWorld* world;
 	btBroadphaseInterface*	broadphase;
@@ -37,5 +36,9 @@ public:
 	std::vector<RigidPhysicsObject*> rigidObjects;
 
 private:
-	
+	void processCollisions();
+	bool processCollision(TriangleMeshPhysicsObject* ob, btRigidBody* other, btManifoldPoint& pt, btVector3& pos, btVector3& normal);
+	void refitMesh(TriangleMeshPhysicsObject* object);
+	void dampenBounce(btRigidBody* ob, btManifoldPoint& pt, btVector3& normal);
+	TriangleMeshPhysicsObject* convertRigidBodyToTriangleMeshPhysicsObject(btRigidBody* object);
 };

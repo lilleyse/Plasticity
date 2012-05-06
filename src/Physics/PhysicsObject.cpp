@@ -12,6 +12,11 @@ btCollisionObject* PhysicsObject::getCollisionObject()
 	return this->collisionObject;
 }
 
+btCollisionShape* PhysicsObject::getCollisionShape()
+{
+	return this->collisionShape;
+}
+
 //Mesh
 Mesh* PhysicsObject::getAttachedMesh()
 {

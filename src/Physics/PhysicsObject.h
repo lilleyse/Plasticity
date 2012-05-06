@@ -23,6 +23,7 @@ public:
 
 	//Collision object
 	btCollisionObject* getCollisionObject();
+	btCollisionShape* getCollisionShape();
 
 	//Mesh
 	Mesh* getAttachedMesh();

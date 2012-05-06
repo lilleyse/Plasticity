@@ -11,6 +11,7 @@
 #include "Cameras/Camera3rdPerson.h"
 #include "Physics/PhysicsWorld.h"
 #include "Physics/RigidPhysicsObject.h"
+#include "Physics/TriangleMeshPhysicsObject.h"
 
 
 namespace
@@ -177,12 +178,18 @@ void initPhysics()
 	btCollisionDispatcher * dispatcher = static_cast<btCollisionDispatcher *>(physicsWorld->world->getDispatcher());
 	btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
 
+
 	//ground plane
-	RigidPhysicsObject* floor = new RigidPhysicsObject(
-		PRIMITIVE_MESH,
-		Globals::meshLibrary.getMesh(5),
-		0.0f,0.9f,0.8f);
-	floor->translateY(-10.0f);
+	PlasticityMaterial* floorMaterial = new PlasticityMaterial();
+	floorMaterial->threshold = 5.0f;
+	floorMaterial->maxMagnitude = 1.0f;
+	floorMaterial->breadth = 14.0f;
+	floorMaterial->malleability = 0.5f;
+	floorMaterial->falloff = 1.0f;
+
+	TriangleMeshPhysicsObject* floor = new TriangleMeshPhysicsObject(
+		Globals::meshLibrary.getMesh(5),0.0f,0.6f,0.8f,true,floorMaterial);
+	//floor->translateY(-10.0f);
 	floor->rotate(glm::vec3(1,0,0),0);
 	floor->setScale(glm::vec3(1,1,1));
 	physicsWorld->addRigidObject(floor);
@@ -195,10 +202,23 @@ void initPhysics()
 }
 void shootBall()
 {
+	/*PlasticityMaterial* projectileMaterial = new PlasticityMaterial();
+	projectileMaterial->threshold = 6.0f;
+	projectileMaterial->maxMagnitude = 0.6f;
+	projectileMaterial->breadth = 0.5f;
+	projectileMaterial->malleability = 0.3f;
+	projectileMaterial->falloff = 1.0f;
+
+	TriangleMeshPhysicsObject* bullet = new TriangleMeshPhysicsObject(
+		Globals::meshLibrary.getMesh(3),1.0f,0.6f,0.7f,true,projectileMaterial);
+	float forceAmount = 1000.0f;
+	bullet->setTranslation(camera.getCameraPos());
+	((btRigidBody*)bullet->getCollisionObject())->applyCentralForce(Utils::convertGLMVectorToBullet(forceAmount*camera.getLookDir()));
+	//((btRigidBody*)bullet->getCollisionObject())->applyTorque(btVector3(100,0,100));
+	physicsWorld->addRigidObject(bullet);*/
+
 	RigidPhysicsObject* bullet = new RigidPhysicsObject(
-		PRIMITIVE_SPHERE,
-		Globals::meshLibrary.getMesh(3),
-		1.0f,0.9f,0.7f);
+		PRIMITIVE_SPHERE,Globals::meshLibrary.getMesh(3),1.0f,0.6f,0.7f);
 	float forceAmount = 1000.0f;
 	bullet->setTranslation(camera.getCameraPos());
 	((btRigidBody*)bullet->getCollisionObject())->applyCentralForce(Utils::convertGLMVectorToBullet(forceAmount*camera.getLookDir()));
