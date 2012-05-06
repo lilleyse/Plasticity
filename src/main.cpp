@@ -194,15 +194,24 @@ void initPhysics()
 	floor->setScale(glm::vec3(.5,1,1));
 	physicsWorld->addRigidObject(floor);
 
-	//Bullet
-	//SoftPhysicsObject* ball = new SoftPhysicsObject(
-	//	Globals::meshLibrary.getMesh(6), 4, 10,
-	//	10.0f,0.9f,0.7f);
-	//physicsWorld->addSoftObject(ball);
+	/*
+	RigidPhysicsObject* floor = new RigidPhysicsObject(
+		PRIMITIVE_BOX,Globals::meshLibrary.getMesh(1),0.0f,0.6f,0.8f);
+	floor->setTranslation(glm::vec3(0,-10,0));
+	floor->setScale(glm::vec3(10,1,10));
+	physicsWorld->addRigidObject(floor);*/
+
+	/*
+	SoftPhysicsObject* ball = new SoftPhysicsObject(
+		Globals::meshLibrary.getMesh(6), 4, 10,
+		10.0f,0.9f,0.7f);
+	physicsWorld->addSoftObject(ball);
+	*/
 }
 void shootBall()
 {
-	/*PlasticityMaterial* projectileMaterial = new PlasticityMaterial();
+	/*
+	PlasticityMaterial* projectileMaterial = new PlasticityMaterial();
 	projectileMaterial->threshold = 6.0f;
 	projectileMaterial->maxMagnitude = 0.6f;
 	projectileMaterial->breadth = 0.5f;
@@ -215,8 +224,9 @@ void shootBall()
 	bullet->setTranslation(camera.getCameraPos());
 	((btRigidBody*)bullet->getCollisionObject())->applyCentralForce(Utils::convertGLMVectorToBullet(forceAmount*camera.getLookDir()));
 	//((btRigidBody*)bullet->getCollisionObject())->applyTorque(btVector3(100,0,100));
-	physicsWorld->addRigidObject(bullet);*/
-
+	physicsWorld->addRigidObject(bullet);
+	*/
+	
 	RigidPhysicsObject* bullet = new RigidPhysicsObject(
 		PRIMITIVE_SPHERE,Globals::meshLibrary.getMesh(3),1.0f,0.6f,0.7f);
 	float forceAmount = 1000.0f;
@@ -293,8 +303,8 @@ void drawWireframe(bool enable)
 int main (int argc, char **argv)
 {
     // Create the main rendering window
-	int width = 800;
-	int height = 800;
+	int width = 1024;
+	int height = 768;
 	sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode(width, height, 32), "Plasticity", 6UL, sf::WindowSettings(24U, 8U, 4U));
 	
     window->SetActive();
