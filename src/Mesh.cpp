@@ -44,19 +44,19 @@ Mesh::Mesh(BaseMesh* baseMesh, GLenum usage)
 	if(baseMesh->containsPositions)
 	{
 		glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-		offset = sizeof(float)*3;
+		offset += sizeof(float)*3;
 	}
 
 	if(baseMesh->containsNormals)
 	{
 		glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offset));
-		offset = sizeof(float)*3;
+		offset += sizeof(float)*3;
 	}
 
 	if(baseMesh->containsUVs)
 	{
 		glVertexAttribPointer(UV, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offset));
-		offset = sizeof(float)*2;
+		offset += sizeof(float)*2;
 	}
 
 	//bind element array
@@ -66,6 +66,9 @@ Mesh::Mesh(BaseMesh* baseMesh, GLenum usage)
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	
+	
 }
 
 Mesh::~Mesh(){}
@@ -92,6 +95,7 @@ void Mesh::updateVertices()
 
 void Mesh::render()
 {
+
 	//set texture for render
 	if(baseMesh->containsUVs)
 	{
@@ -100,7 +104,7 @@ void Mesh::render()
 	}
 
 	glBindVertexArray(vertexArrayObject);
-    glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_PATCHES, numElements, GL_UNSIGNED_SHORT, 0);
     glBindVertexArray(0);
 }
 

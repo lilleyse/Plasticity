@@ -17,15 +17,27 @@ void ShaderState::initialize()
 	std::string fragShaderPath = "data/shaders/ColorPassthrough.frag";
 	shaderList.push_back(loadShader(GL_VERTEX_SHADER, vertexShaderPath));
     shaderList.push_back(loadShader(GL_FRAGMENT_SHADER, fragShaderPath));
-
     basicProgram = createProgram(shaderList);
 	
-	glUseProgramStages(pipeline, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, basicProgram);
+	std::string vertexShaderTessellationPath = "data/shaders/Tessellation.vert";
+	std::string tessControlPath = "data/shaders/TessControl.cont";
+	std::string tessEvalPath = "data/shaders/TessEval.eval";
+
+	shaderList.clear();
+	shaderList.push_back(loadShader(GL_VERTEX_SHADER, vertexShaderTessellationPath));
+	shaderList.push_back(loadShader(GL_TESS_CONTROL_SHADER, tessControlPath));
+	shaderList.push_back(loadShader(GL_TESS_EVALUATION_SHADER, tessEvalPath));
+    shaderList.push_back(loadShader(GL_FRAGMENT_SHADER, fragShaderPath));
+	tessellationProgram = createProgram(shaderList);
+
+
+	//glUseProgramStages(pipeline, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, basicProgram);
 }
 
 void ShaderState::prepareForRender()
 {
-	glBindProgramPipeline(pipeline);
+	//glBindProgramPipeline(pipeline);
+	glUseProgram(tessellationProgram);
 }
 
 
@@ -35,6 +47,12 @@ const char* ShaderState::getShaderName(GLenum eShaderType)
     {
     case GL_VERTEX_SHADER:
         return "vertex";
+        break;
+	case GL_TESS_CONTROL_SHADER:
+        return "tess_control";
+        break;
+	case GL_TESS_EVALUATION_SHADER:
+        return "tess_evaluation";
         break;
     case GL_GEOMETRY_SHADER:
         return "geometry";
@@ -94,7 +112,7 @@ GLuint ShaderState::loadShader(GLenum eShaderType, std::string& strShaderFilenam
 GLuint ShaderState::createProgram(const std::vector<GLuint> &shaderList)
 {
     GLuint program = glCreateProgram();
-	glProgramParameteri(program, GL_PROGRAM_SEPARABLE, GL_TRUE);
+	//glProgramParameteri(program, GL_PROGRAM_SEPARABLE, GL_TRUE);
 
     for(size_t iLoop = 0; iLoop < shaderList.size(); iLoop++)
 	{

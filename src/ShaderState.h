@@ -13,6 +13,8 @@ public:
 	void prepareForRender();
 
 	GLuint basicProgram;
+	GLuint tessellationProgram;
+
 	GLuint pipeline;
 
 private:

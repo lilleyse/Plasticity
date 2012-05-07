@@ -1,0 +1,29 @@
+#version 420
+
+layout(vertices = 3) out;
+
+in Vertex
+{
+	vec3 modelSpaceNormal;
+	vec3 modelSpacePosition;
+	vec2 texcoord;
+} vertexIn[];
+
+out Vertex
+{
+	vec3 modelSpaceNormal;
+	vec3 modelSpacePosition;
+	vec2 texcoord;
+} vertexOut[];
+
+void main()
+{
+	gl_TessLevelInner[0] = 2.0;
+	gl_TessLevelOuter[0] = 2.0;
+	gl_TessLevelOuter[1] = 2.0;
+	gl_TessLevelOuter[2] = 2.0;
+
+	vertexOut[gl_InvocationID].modelSpaceNormal = vertexIn[gl_InvocationID].modelSpaceNormal;
+	vertexOut[gl_InvocationID].modelSpacePosition = vertexIn[gl_InvocationID].modelSpacePosition;
+	vertexOut[gl_InvocationID].texcoord = vertexIn[gl_InvocationID].texcoord;
+}

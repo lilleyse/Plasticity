@@ -1,0 +1,64 @@
+#version 420
+
+layout(triangles, equal_spacing, ccw) in;
+
+in Vertex
+{
+	vec3 modelSpaceNormal;
+	vec3 modelSpacePosition;
+	vec2 texcoord;
+} vertexIn[];
+
+out gl_PerVertex
+{
+	vec4 gl_Position;
+};
+
+out Vertex
+{
+	vec3 vertexNormal;
+	vec3 cameraSpacePosition;
+	vec2 texcoord;
+} vertexOut;
+
+
+layout(binding = 0) uniform Projection
+{
+	mat4 projectionMatrix;
+};
+
+struct ModelViewStruct
+{
+	mat4 normalMatrix;
+	mat4 matrix;
+};
+
+layout(binding = 1) uniform ModelView
+{
+	ModelViewStruct modelView;
+};
+
+vec2 interpolate2D(vec2 v0, vec2 v1, vec2 v2)
+{
+   	 return gl_TessCoord.x * v0 + gl_TessCoord.y *v1 + gl_TessCoord.z * v2;
+}
+
+vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2)
+{
+   	 return gl_TessCoord.x * v0 + gl_TessCoord.y * v1 + gl_TessCoord.z * v2;
+}
+
+void main()
+{
+
+	vec3 interpPosition = interpolate3D(vertexIn[0].modelSpacePosition, vertexIn[1].modelSpacePosition, vertexIn[2].modelSpacePosition);
+	vec3 interpNormal = interpolate3D(vertexIn[0].modelSpaceNormal, vertexIn[1].modelSpaceNormal, vertexIn[2].modelSpaceNormal);
+	vec2 interpTexcoord = interpolate2D(vertexIn[0].texcoord, vertexIn[1].texcoord, vertexIn[2].texcoord);
+
+	vec4 tempCamPosition = (modelView.matrix * vec4(interpPosition, 1.0));
+	gl_Position = projectionMatrix * tempCamPosition;
+
+	vertexOut.vertexNormal = normalize(mat3(modelView.normalMatrix) * interpNormal);
+	vertexOut.cameraSpacePosition = vec3(tempCamPosition);
+	vertexOut.texcoord = interpTexcoord;
+}

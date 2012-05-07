@@ -115,6 +115,7 @@ vec4 ComputeLighting(in PerLight lightData)
 void main()
 {
 
+	//fragColor = vec4(vertexIn.texcoord.x, vertexIn.texcoord.y, 0, 1);
 	if(Mtl.getColorFromTexture == 0)
 	{
 		diffuseColor = Mtl.diffuseColor;
