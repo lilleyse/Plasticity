@@ -7,7 +7,8 @@
 enum Attributes
 {
 	POSITION,
-	NORMAL
+	NORMAL,
+	UV
 };
 
 

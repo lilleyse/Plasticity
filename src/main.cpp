@@ -45,15 +45,6 @@ namespace
 	GLuint materialUBO;
 	GLuint materialBindingIndex = 5;
 
-	//material
-
-	struct MaterialBlock
-	{
-		glm::vec4 diffuseColor;
-		glm::vec4 specularColor;
-		float specularShininess;
-		float padding[3];
-	};
 
 	//lighting
 
@@ -150,16 +141,9 @@ void initGL()
     glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_Lighting), &lightingGL, GL_STATIC_DRAW);
     glBindBufferBase(GL_UNIFORM_BUFFER, lightingBindingIndex, lightingUBO);
 
-	//init material
-
-	MaterialBlock material;
-	material.diffuseColor = glm::vec4(1,0,0,1);
-	material.specularColor = glm::vec4(1,1,1,1);
-	material.specularShininess = 0.1f;
-
 	glGenBuffers(1, &materialUBO);
 	glBindBuffer(GL_UNIFORM_BUFFER, materialUBO);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(MaterialBlock), &material, GL_STATIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(MaterialBlock), 0, GL_STREAM_DRAW);
 	glBindBufferBase(GL_UNIFORM_BUFFER, materialBindingIndex, materialUBO);
 
 	//init other things
@@ -281,6 +265,14 @@ void enterFrame()
 		
 		*modelViewPointer = modelViewStruct;
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
+
+		//update material
+		glBindBuffer(GL_UNIFORM_BUFFER, materialUBO);
+		MaterialBlock* materialBlockPointer = (MaterialBlock*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(MaterialBlock), 
+					GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+		*materialBlockPointer = object->getAttachedMesh()->getBaseMesh()->material;
+		glUnmapBuffer(GL_UNIFORM_BUFFER);
+
 
 		//update and render
 		object->update();

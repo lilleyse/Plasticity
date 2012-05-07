@@ -7,6 +7,8 @@
 		Uniforms
 ---------------------------*/
 
+layout(binding = 0) uniform sampler2D diffuseColorSampler;
+
 struct PerLight
 {
 	vec4 cameraSpaceLightPos;
@@ -32,6 +34,7 @@ layout(binding = 5) uniform Material
 	vec4 diffuseColor;
 	vec4 specularColor;
 	float specularShininess;
+	int getColorFromTexture;
 } Mtl;
 
 
@@ -43,6 +46,7 @@ in Vertex
 {
 	vec3 vertexNormal;
 	vec3 cameraSpacePosition;
+	vec2 texcoord;
 	
 } vertexIn;
 
@@ -52,6 +56,12 @@ in Vertex
 
 layout (location = 0, index = 0) out vec4 fragColor;
 
+
+/*---------------------------
+		Global vars
+----------------------------*/
+
+vec4 diffuseColor;
 
 /*-------------------------
 		Functions
@@ -92,7 +102,7 @@ vec4 ComputeLighting(in PerLight lightData)
 
 	gaussianTerm = cosAngIncidence != 0.0 ? gaussianTerm : 0.0;
 	
-	vec4 lighting = Mtl.diffuseColor * lightIntensity * cosAngIncidence;
+	vec4 lighting = diffuseColor * lightIntensity * cosAngIncidence;
 	lighting += Mtl.specularColor * lightIntensity * gaussianTerm;
 	
 	return lighting;
@@ -104,7 +114,19 @@ vec4 ComputeLighting(in PerLight lightData)
 
 void main()
 {
-	vec4 accumLighting = Lgt.ambientIntensity;
+
+	if(Mtl.getColorFromTexture == 0)
+	{
+		diffuseColor = Mtl.diffuseColor;
+	}
+	else
+	{
+		diffuseColor = texture(diffuseColorSampler, vertexIn.texcoord);
+	}
+
+
+
+	vec4 accumLighting = diffuseColor*Lgt.ambientIntensity;
 	for(int light = 0; light < numLightsUsed; light++)
 	{
 		accumLighting += ComputeLighting(Lgt.lights[light]);

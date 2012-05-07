@@ -28,6 +28,7 @@ layout(binding = 1) uniform ModelView
 ---------------------------*/
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
+layout(location = 2) in vec2 texcoord;
 
 /*-------------------------
 		Outputs
@@ -44,6 +45,7 @@ out Vertex
 {
 	vec3 vertexNormal;
 	vec3 cameraSpacePosition;
+	vec2 texcoord;
 	
 } vertexOut;
 
@@ -58,4 +60,5 @@ void main()
 
 	vertexOut.vertexNormal = normalize(mat3(modelView.normalMatrix) * normal);
 	vertexOut.cameraSpacePosition = vec3(tempCamPosition);
+	vertexOut.texcoord = texcoord;
 }

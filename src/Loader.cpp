@@ -108,17 +108,34 @@ Vertex* Loader::loadVertexDataForStaticMesh(TiXmlElement* vertexData, int& numVe
 	std::string vertexCountString = vertexData->Attribute("count");
 	numVertices = atoi(vertexCountString.c_str());
 
+	std::string positionData;
+	std::string normalData;
+	std::string UVData;
+
 	TiXmlElement* positionElement = vertexData->FirstChildElement("position");
-	std::string positionData = positionElement->FirstChild()->Value();
-	if(positionData == "") containsPositions = false; else containsPositions = true;
-	float width = (float)atof(positionElement->Attribute("width"));
-	float height = (float)atof(positionElement->Attribute("height"));
-	float depth = (float)atof(positionElement->Attribute("depth"));
+	if(positionElement)
+	{
+		positionData = positionElement->FirstChild()->Value();
+		containsPositions = true;
+		float width = (float)atof(positionElement->Attribute("width"));
+		float height = (float)atof(positionElement->Attribute("height"));
+		float depth = (float)atof(positionElement->Attribute("depth"));
+	}
 	
-	std::string normalData = vertexData->FirstChildElement("normal")->FirstChild()->Value();
-	if(normalData == "") containsNormals = false; else containsNormals = true;
-	std::string UVData = "";//vertexData->FirstChildElement("UV")->FirstChild()->Value();
-	if(UVData == "") containsUVs = false; else containsUVs = true;
+	TiXmlElement* normalElement = vertexData->FirstChildElement("normal");
+	if(normalElement)
+	{
+		normalData = normalElement->FirstChild()->Value();
+		containsNormals = true;
+	}
+
+	TiXmlElement* UVElement = vertexData->FirstChildElement("UV");
+	if(UVElement)
+	{
+		UVData = UVElement->FirstChild()->Value();
+		containsUVs = true;
+	}
+
    
 	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 	boost::char_separator<char> sep(" ");
@@ -177,13 +194,18 @@ BaseMesh* Loader::readColladaAsset(std::string& fileName)
 	std::vector<unsigned short> elementArray = parseDataIntoUShorts(elementArrayElement->FirstChild()->Value(), numElements);
 
 	//the texture name may be ""
-	std::string textureName = "";//header->FirstChildElement("texture_name")->FirstChild()->Value();
+	std::string textureName = "";
+	TiXmlElement* textureNameElement = header->FirstChildElement("texture_name");
+	if(textureNameElement != 0)
+	{
+		textureName = textureNameElement->FirstChild()->Value();
+	}
 
 	TiXmlElement* vertexDataElement = header->FirstChildElement("vertex_data");
 	int numVertices;
-	bool containsPositions;
-	bool containsNormals;
-	bool containsUVs;
+	bool containsPositions = false;
+	bool containsNormals = false;
+	bool containsUVs = false;
 
 
 
