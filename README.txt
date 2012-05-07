@@ -20,4 +20,4 @@ Middle mouse click and drag to pan.
 Right click to throw projectiles.
 'W' to turn on wireframe
 'T' to enable tessellation
-
+Space to pause the physics simulation

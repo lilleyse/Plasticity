@@ -175,7 +175,7 @@ void initPhysics()
 	TriangleMeshPhysicsObject* floor2 = new TriangleMeshPhysicsObject(
 		Globals::meshLibrary.getMesh(5),0.0f,0.6f,0.8f,true,floorMaterial);
 	floor2->translateY(-15.0f);
-	floor2->scale(.05);
+	floor2->scale(.05f);
 	//floor2->rotate(glm::vec3(0,1,0), .5);
 	physicsWorld->addRigidObject(floor2);
 
