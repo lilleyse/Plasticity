@@ -10,7 +10,7 @@ void MeshLibrary::initialize()
 	std::string filename;
 
 	//should be pumpkin
-	filename = "data/meshes/cube.xml";
+	filename = "data/meshes/car.xml";
 	meshes.push_back(loader.readColladaAsset(Utils::getFilePath(filename)));
 
 	filename = "data/meshes/cube.xml";

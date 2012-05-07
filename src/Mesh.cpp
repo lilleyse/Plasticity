@@ -11,7 +11,8 @@ Mesh::Mesh(BaseMesh* baseMesh, GLenum usage)
 
 
 	this->baseMesh = baseMesh;
-	this->vertices = baseMesh->vertices;
+	this->vertices = new Vertex[numVertices];
+	memcpy(this->vertices, baseMesh->vertices, numVertices*sizeof(Vertex));
 
 	//create and bind array buffer, set data
     glGenBuffers(1, &arrayBufferObject);
@@ -104,7 +105,10 @@ void Mesh::render()
 	}
 
 	glBindVertexArray(vertexArrayObject);
-    glDrawElements(GL_PATCHES, numElements, GL_UNSIGNED_SHORT, 0);
+	if(Globals::shaderState.tessellationEnabled)
+		glDrawElements(GL_PATCHES, numElements, GL_UNSIGNED_SHORT, 0);
+	else
+		glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_SHORT, 0);
     glBindVertexArray(0);
 }
 

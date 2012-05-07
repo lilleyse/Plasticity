@@ -1,6 +1,6 @@
 #version 420
 
-layout(vertices = 3) out;
+layout(vertices = 1) out;
 
 in Vertex
 {
@@ -9,21 +9,80 @@ in Vertex
 	vec2 texcoord;
 } vertexIn[];
 
-out Vertex
+struct OutputPatch
 {
-	vec3 modelSpaceNormal;
-	vec3 modelSpacePosition;
-	vec2 texcoord;
-} vertexOut[];
+    vec3 B030;
+    vec3 B021;
+    vec3 B012;
+    vec3 B003;
+    vec3 B102;
+    vec3 B201;
+    vec3 B300;
+    vec3 B210;
+    vec3 B120;
+    vec3 B111;
+    vec3 modelSpaceNormal[3];
+    vec2 texcoord[3];
+};
+
+out patch OutputPatch outPatch;
+
+
+vec3 ProjectToPlane(vec3 Point, vec3 PlanePoint, vec3 PlaneNormal)
+{
+    vec3 v = Point - PlanePoint;
+    float Len = dot(v, PlaneNormal);
+    vec3 d = Len * PlaneNormal;
+    return (Point - d);
+}
+
+void CalcPositions()
+{
+    // The original vertices stay the same
+    outPatch.B030 = vertexIn[0].modelSpacePosition;
+    outPatch.B003 = vertexIn[1].modelSpacePosition;
+    outPatch.B300 = vertexIn[2].modelSpacePosition;
+
+    // Edges are names according to the opposing vertex
+    vec3 EdgeB300 = outPatch.B003 - outPatch.B030;
+    vec3 EdgeB030 = outPatch.B300 - outPatch.B003;
+    vec3 EdgeB003 = outPatch.B030 - outPatch.B300;
+
+    // Generate two midpoints on each edge
+    outPatch.B021 = outPatch.B030 + EdgeB300 / 3.0;
+    outPatch.B012 = outPatch.B030 + EdgeB300 * 2.0 / 3.0;
+    outPatch.B102 = outPatch.B003 + EdgeB030 / 3.0;
+    outPatch.B201 = outPatch.B003 + EdgeB030 * 2.0 / 3.0;
+    outPatch.B210 = outPatch.B300 + EdgeB003 / 3.0;
+    outPatch.B120 = outPatch.B300 + EdgeB003 * 2.0 / 3.0;
+
+    // Project each midpoint on the plane defined by the nearest vertex and its normal
+    outPatch.B021 = ProjectToPlane(outPatch.B021, outPatch.B030, outPatch.modelSpaceNormal[0]);
+    outPatch.B012 = ProjectToPlane(outPatch.B012, outPatch.B003, outPatch.modelSpaceNormal[1]);
+    outPatch.B102 = ProjectToPlane(outPatch.B102, outPatch.B003, outPatch.modelSpaceNormal[1]);
+    outPatch.B201 = ProjectToPlane(outPatch.B201, outPatch.B300, outPatch.modelSpaceNormal[2]);
+    outPatch.B210 = ProjectToPlane(outPatch.B210, outPatch.B300, outPatch.modelSpaceNormal[2]);
+    outPatch.B120 = ProjectToPlane(outPatch.B120, outPatch.B030, outPatch.modelSpaceNormal[0]);
+
+    // Handle the center
+    vec3 Center = (outPatch.B003 + outPatch.B030 + outPatch.B300) / 3.0;
+    outPatch.B111 = (outPatch.B021 + outPatch.B012 + outPatch.B102 + outPatch.B201 + outPatch.B210 + outPatch.B120) / 6.0;
+    outPatch.B111 += (outPatch.B111 - Center) / 2.0;
+}
 
 void main()
 {
+
+	// Set the control points of the output patch
+    for (int i = 0 ; i < 3 ; i++) {
+		outPatch.modelSpaceNormal[i] = vertexIn[i].modelSpaceNormal;
+		outPatch.texcoord[i] = vertexIn[i].texcoord;
+    }
+
+    CalcPositions();
+
 	gl_TessLevelInner[0] = 2.0;
 	gl_TessLevelOuter[0] = 2.0;
 	gl_TessLevelOuter[1] = 2.0;
 	gl_TessLevelOuter[2] = 2.0;
-
-	vertexOut[gl_InvocationID].modelSpaceNormal = vertexIn[gl_InvocationID].modelSpaceNormal;
-	vertexOut[gl_InvocationID].modelSpacePosition = vertexIn[gl_InvocationID].modelSpacePosition;
-	vertexOut[gl_InvocationID].texcoord = vertexIn[gl_InvocationID].texcoord;
 }

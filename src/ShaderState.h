@@ -17,6 +17,8 @@ public:
 
 	GLuint pipeline;
 
+	bool tessellationEnabled;
+
 private:
 	//modified from http://arcsynthesis.org/gltut/
     GLuint createProgram(const std::vector<GLuint> &shaderList);

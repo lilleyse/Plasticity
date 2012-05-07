@@ -87,7 +87,7 @@ void initGL()
 	//init OpenGL
 	gl3wInit();
 	fzNear = .10f;
-    fzFar = 100.0f;
+    fzFar = 1000.0f;
     float fieldOfViewDeg = 45.0f;
 	float fFovRad = fieldOfViewDeg * DEGREE_TO_RAD;
     frustumScale = 1.0f / tan(fFovRad / 2.0f);
@@ -165,32 +165,21 @@ void initPhysics()
 
 	//ground plane
 	PlasticityMaterial* floorMaterial = new PlasticityMaterial();
-	floorMaterial->threshold = 5.0f;
-	floorMaterial->maxMagnitude = 1.0f;
-	floorMaterial->breadth = 14.0f;
-	floorMaterial->malleability = 0.5f;
+	floorMaterial->threshold = 4.0f;
+	floorMaterial->maxMagnitude = .7f;
+	floorMaterial->breadth = 15.0f;
+	floorMaterial->malleability = .5f;
 	floorMaterial->falloff = 2.0f;
 
-	TriangleMeshPhysicsObject* floor = new TriangleMeshPhysicsObject(
+	Globals::meshLibrary.getMesh(5)->material.diffuseColor = glm::vec4(0,1,1,1);
+	TriangleMeshPhysicsObject* floor2 = new TriangleMeshPhysicsObject(
 		Globals::meshLibrary.getMesh(5),0.0f,0.6f,0.8f,true,floorMaterial);
-	floor->translateY(-10.0f);
-	floor->rotate(glm::vec3(1,0,0),.5);
-	//floor->setScale(glm::vec3(.5,1,1));
-	physicsWorld->addRigidObject(floor);
+	floor2->translateY(-15.0f);
+	floor2->scale(.05);
+	//floor2->rotate(glm::vec3(0,1,0), .5);
+	physicsWorld->addRigidObject(floor2);
 
-	/*
-	RigidPhysicsObject* floor = new RigidPhysicsObject(
-		PRIMITIVE_BOX,Globals::meshLibrary.getMesh(1),0.0f,0.6f,0.8f);
-	floor->setTranslation(glm::vec3(0,-10,0));
-	floor->setScale(glm::vec3(10,1,10));
-	physicsWorld->addRigidObject(floor);*/
-
-	/*
-	SoftPhysicsObject* ball = new SoftPhysicsObject(
-		Globals::meshLibrary.getMesh(6), 4, 10,
-		10.0f,0.9f,0.7f);
-	physicsWorld->addSoftObject(ball);
-	*/
+	
 }
 void shootBall()
 {
@@ -213,9 +202,10 @@ void shootBall()
 	
 	RigidPhysicsObject* bullet = new RigidPhysicsObject(
 		PRIMITIVE_SPHERE,Globals::meshLibrary.getMesh(3),1.0f,0.6f,0.7f);
-	float forceAmount = 1000.0f;
+	float forceAmount = 1500.0f;
 	bullet->setTranslation(camera.getCameraPos());
 	((btRigidBody*)bullet->getCollisionObject())->applyCentralForce(Utils::convertGLMVectorToBullet(forceAmount*camera.getLookDir()));
+	((btRigidBody*)bullet->getCollisionObject())->applyTorque(btVector3(100,0,100));
 	physicsWorld->addRigidObject(bullet);
 }
 void resize(int w, int h)
@@ -425,6 +415,10 @@ int main (int argc, char **argv)
 					{
 						wireframe = !wireframe;
 						drawWireframe(wireframe);
+					}
+					else if(myEvent.Key.Code == sf::Key::T)
+					{
+						Globals::shaderState.tessellationEnabled = !Globals::shaderState.tessellationEnabled;
 					}
 					break;
 

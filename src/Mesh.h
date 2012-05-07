@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include "BaseMesh.h"
+#include "Globals.h"
 
 enum Attributes
 {

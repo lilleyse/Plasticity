@@ -2,7 +2,7 @@
 
 ShaderState::ShaderState()
 {
-
+	this->tessellationEnabled = false;
 }
 
 void ShaderState::initialize()
@@ -37,7 +37,10 @@ void ShaderState::initialize()
 void ShaderState::prepareForRender()
 {
 	//glBindProgramPipeline(pipeline);
-	glUseProgram(tessellationProgram);
+	if(tessellationEnabled)
+		glUseProgram(tessellationProgram);
+	else
+		glUseProgram(basicProgram);
 }
 
 
